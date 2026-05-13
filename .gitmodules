@@ -1,0 +1,6 @@
+[submodule "submodules/bruno"]
+	path = submodules/bruno
+	url = https://github.com/usebruno/bruno.git
+[submodule "submodules/product-appsec-apidocs"]
+	path = submodules/product-appsec-apidocs
+	url = https://github.com/xcidic/product-appsec-apidocs.git
