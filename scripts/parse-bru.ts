@@ -6,6 +6,11 @@ import { fileURLToPath } from "node:url"
 
 import { bruToJsonV2 } from "@usebruno/lang"
 
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null
+
+const asString = (value: unknown) => (typeof value === "string" ? value : undefined)
+
 const scriptDir = dirname(fileURLToPath(import.meta.url))
 const projectRoot = dirname(scriptDir)
 const collectionDir = join(projectRoot, "submodules/product-appsec-apidocs/main-api-collection")
@@ -43,21 +48,25 @@ for (const file of bruFiles) {
   try {
     const parsed = bruToJsonV2(content)
 
-    const meta = parsed.meta ?? {}
-    const http = parsed.http ?? {}
-    const params = parsed.params ?? []
-    const body = parsed.body
-    const docs = parsed.docs
-    const examples = parsed.examples
+    const meta = isRecord(parsed.meta) ? parsed.meta : {}
+    const http = isRecord(parsed.http) ? parsed.http : {}
+    const body = isRecord(parsed.body) ? parsed.body : {}
+    const docs = asString(parsed.docs)
+    const examples = Array.isArray(parsed.examples) ? parsed.examples : []
+    const params = Array.isArray(parsed.params) ? parsed.params.filter(isRecord) : []
 
-    const pathParams = params.filter((p: any) => p.type === "path")
-    const queryParams = params.filter((p: any) => p.type === "query")
+    const pathParams = params.filter((p) => p.type === "path")
+    const queryParams = params.filter((p) => p.type === "query")
+    const formatParam = (param: Record<string, unknown>) =>
+      `${asString(param.name) ?? "?"}${param.enabled === false ? " (disabled)" : ""}`
+    const metaName = asString(meta.name) ?? relPath
+    const method = asString(http.method)?.toUpperCase() ?? "?"
+    const url = asString(http.url) ?? "?"
 
-    console.log(`── ${meta.name ?? relPath} ──`)
+    console.log(`── ${metaName} ──`)
     console.log(`  File:   ${relPath}`)
-    console.log(`  Method: ${http.method?.toUpperCase() ?? "?"}`)
+    console.log(`  Method: ${method}`)
 
-    const url = http.url ?? "?"
     const placeholders = url.match(/:(\w+)/g)
     if (placeholders) {
       console.log(`  URL:    ${url}`)
@@ -68,32 +77,40 @@ for (const file of bruFiles) {
 
     if (pathParams.length) {
       console.log(
-        `  Path params:  ${pathParams.map((p: any) => `${p.name}${p.enabled === false ? " (disabled)" : ""}`).join(", ")}`,
+        `  Path params:  ${pathParams.map(formatParam).join(", ")}`,
       )
     }
     if (queryParams.length) {
       console.log(
-        `  Query params: ${queryParams.map((p: any) => `${p.name}${p.enabled === false ? " (disabled)" : ""}`).join(", ")}`,
+        `  Query params: ${queryParams.map(formatParam).join(", ")}`,
       )
     }
-    if (body?.json) {
+    if (asString(body.json)) {
       console.log(`  Body:   JSON present`)
     }
     if (docs) {
-      const firstLine = docs.trim().split("\n")[0]
+      const firstLine = docs.trim().split("\n")[0] ?? ""
       console.log(`  Docs:   ${firstLine.slice(0, 120)}`)
     }
-    if (examples?.length) {
+    if (examples.length) {
       const ex = examples[0]
-      if (ex.response?.body?.content) {
-        const status = ex.response.status
+      const response = isRecord(ex) && isRecord(ex.response) ? ex.response : undefined
+      const responseBody = response && isRecord(response.body) ? response.body : undefined
+      const responseContent = asString(responseBody?.content)
+      const status =
+        response && isRecord(response.status) ? response.status : undefined
+
+      if (responseContent) {
+        const statusCode = asString(status?.code) ?? status?.code ?? "?"
+        const statusText = asString(status?.text) ?? ""
         console.log(
-          `  Resp:   ${status?.code ?? "?"} ${status?.text ?? ""} (${ex.response.body.content.length} bytes JSON)`,
+          `  Resp:   ${statusCode} ${statusText} (${responseContent.length} bytes JSON)`,
         )
       }
     }
     console.log("")
-  } catch (err: any) {
-    console.error(`✗ Failed to parse ${relPath}: ${err.message}`)
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err)
+    console.error(`✗ Failed to parse ${relPath}: ${message}`)
   }
 }
