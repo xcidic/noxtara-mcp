@@ -12,8 +12,8 @@ importers:
         specifier: ^4.0.0-beta.59
         version: 4.0.0-beta.59(effect@4.0.0-beta.59)(ioredis@5.10.1)
       '@usebruno/lang':
-        specifier: ^0.36.0
-        version: 0.36.0
+        specifier: file:submodules/bruno/packages/bruno-lang
+        version: file:submodules/bruno/packages/bruno-lang
       effect:
         specifier: ^4.0.0-beta.59
         version: 4.0.0-beta.59
@@ -668,8 +668,8 @@ packages:
   '@types/ws@8.18.1':
     resolution: {integrity: sha512-ThVF6DCVhA8kUGy+aazFQ4kXQ7E1Ty7A3ypFOe0IcJV8O/M511G99AW24irKrW56Wt44yG9+ij8FaqoBGkuBXg==}
 
-  '@usebruno/lang@0.36.0':
-    resolution: {integrity: sha512-tc8d4pIXHeJRt95Rny1CJ1pRYaOUWDiVRrLfh265qb/utzNtpjV090GQuzukFAZiaCjRyP3PpK/jGfrKmsT5ww==}
+  '@usebruno/lang@file:submodules/bruno/packages/bruno-lang':
+    resolution: {directory: submodules/bruno/packages/bruno-lang, type: directory}
 
   '@vitest/expect@4.1.5':
     resolution: {integrity: sha512-PWBaRY5JoKuRnHlUHfpV/KohFylaDZTupcXN1H9vYryNLOnitSw60Mw9IAE2r67NbwwzBw/Cc/8q9BK3kIX8Kw==}
@@ -1662,7 +1662,7 @@ snapshots:
     dependencies:
       '@types/node': 24.12.2
 
-  '@usebruno/lang@0.36.0':
+  '@usebruno/lang@file:submodules/bruno/packages/bruno-lang':
     dependencies:
       arcsecond: 5.0.0
       dotenv: 16.6.1

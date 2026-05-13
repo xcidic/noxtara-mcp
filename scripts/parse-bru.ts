@@ -1,18 +1,14 @@
 #!/usr/bin/env node
 
-import { readFileSync, readdirSync, statSync, existsSync } from "node:fs"
-import { join, relative } from "node:path"
+import { readFileSync, readdirSync, existsSync } from "node:fs"
+import { join, relative, dirname } from "node:path"
 import { fileURLToPath } from "node:url"
-import { dirname } from "node:path"
 
-import { bruToJsonV2, collectionBruToJson } from "@usebruno/lang"
+import { bruToJsonV2 } from "@usebruno/lang"
 
 const scriptDir = dirname(fileURLToPath(import.meta.url))
 const projectRoot = dirname(scriptDir)
-const collectionDir = join(
-  projectRoot,
-  "submodules/product-appsec-apidocs/main-api-collection",
-)
+const collectionDir = join(projectRoot, "submodules/product-appsec-apidocs/main-api-collection")
 
 if (!existsSync(collectionDir)) {
   console.error(`Collection not found at ${collectionDir}`)
@@ -20,7 +16,8 @@ if (!existsSync(collectionDir)) {
   process.exit(1)
 }
 
-const isBruFile = (name: string) => name.endsWith(".bru") && name !== "collection.bru" && name !== "folder.bru"
+const isBruFile = (name: string) =>
+  name.endsWith(".bru") && name !== "collection.bru" && name !== "folder.bru"
 
 function collectBruFiles(dir: string): string[] {
   const files: string[] = []
@@ -70,10 +67,14 @@ for (const file of bruFiles) {
     }
 
     if (pathParams.length) {
-      console.log(`  Path params:  ${pathParams.map((p: any) => `${p.name}${p.enabled === false ? " (disabled)" : ""}`).join(", ")}`)
+      console.log(
+        `  Path params:  ${pathParams.map((p: any) => `${p.name}${p.enabled === false ? " (disabled)" : ""}`).join(", ")}`,
+      )
     }
     if (queryParams.length) {
-      console.log(`  Query params: ${queryParams.map((p: any) => `${p.name}${p.enabled === false ? " (disabled)" : ""}`).join(", ")}`)
+      console.log(
+        `  Query params: ${queryParams.map((p: any) => `${p.name}${p.enabled === false ? " (disabled)" : ""}`).join(", ")}`,
+      )
     }
     if (body?.json) {
       console.log(`  Body:   JSON present`)
@@ -86,7 +87,9 @@ for (const file of bruFiles) {
       const ex = examples[0]
       if (ex.response?.body?.content) {
         const status = ex.response.status
-        console.log(`  Resp:   ${status?.code ?? "?"} ${status?.text ?? ""} (${ex.response.body.content.length} bytes JSON)`)
+        console.log(
+          `  Resp:   ${status?.code ?? "?"} ${status?.text ?? ""} (${ex.response.body.content.length} bytes JSON)`,
+        )
       }
     }
     console.log("")

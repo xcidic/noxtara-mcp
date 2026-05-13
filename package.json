@@ -46,7 +46,7 @@
   },
   "dependencies": {
     "@effect/platform-node": "^4.0.0-beta.59",
-    "@usebruno/lang": "^0.36.0",
+    "@usebruno/lang": "file:submodules/bruno/packages/bruno-lang",
     "effect": "^4.0.0-beta.59"
   },
   "devDependencies": {
