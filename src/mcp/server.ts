@@ -1,6 +1,11 @@
 import { createServer } from "node:http"
 
-import { McpServer, StdioServerTransport, WebStandardStreamableHTTPServerTransport, fromJsonSchema } from "@modelcontextprotocol/server"
+import {
+  McpServer,
+  StdioServerTransport,
+  WebStandardStreamableHTTPServerTransport,
+  fromJsonSchema,
+} from "@modelcontextprotocol/server"
 
 import { createBrunoRegistry } from "../runtime/bruno-registry.ts"
 
@@ -75,7 +80,10 @@ export const serveNoxtaraMcp = async (options?: { baseUrl?: string; pat?: string
   await server.connect(transport)
 }
 
-const pipeWebResponseToNode = async (webResponse: Response, res: import("node:http").ServerResponse) => {
+const pipeWebResponseToNode = async (
+  webResponse: Response,
+  res: import("node:http").ServerResponse,
+) => {
   const statusText = webResponse.statusText || undefined
   res.writeHead(webResponse.status, statusText, Object.fromEntries(webResponse.headers))
 
@@ -84,7 +92,10 @@ const pipeWebResponseToNode = async (webResponse: Response, res: import("node:ht
     try {
       while (true) {
         const { done, value } = await reader.read()
-        if (done) { res.end(); return }
+        if (done) {
+          res.end()
+          return
+        }
         res.write(value)
       }
     } catch {
