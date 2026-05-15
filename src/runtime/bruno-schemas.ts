@@ -109,7 +109,12 @@ const buildBodyFieldSchema = (
 }
 
 export const buildInputSchema = (endpoint: {
-  params: Array<{ name: string; location: "path" | "query"; required: boolean; sampleValue?: unknown }>
+  params: Array<{
+    name: string
+    location: "path" | "query"
+    required: boolean
+    sampleValue?: unknown
+  }>
   bodyMode?: string
   body: Record<string, unknown>
 }) => {

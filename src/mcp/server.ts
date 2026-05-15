@@ -4,10 +4,7 @@ import { createBrunoRegistry } from "../runtime/bruno-registry.ts"
 
 const formatError = (error: unknown) => (error instanceof Error ? error.message : String(error))
 
-export const createNoxtaraMcpServer = (options?: {
-  baseUrl?: string
-  pat?: string
-}) => {
+export const createNoxtaraMcpServer = (options?: { baseUrl?: string; pat?: string }) => {
   const registryOptions = options?.baseUrl ? { baseUrl: options.baseUrl } : undefined
   const registry = createBrunoRegistry(registryOptions)
 
@@ -44,10 +41,7 @@ export const createNoxtaraMcpServer = (options?: {
   }
 }
 
-export const serveNoxtaraMcp = async (options?: {
-  baseUrl?: string
-  pat?: string
-}) => {
+export const serveNoxtaraMcp = async (options?: { baseUrl?: string; pat?: string }) => {
   const { server } = createNoxtaraMcpServer(options)
   const transport = new StdioServerTransport()
   await server.connect(transport)

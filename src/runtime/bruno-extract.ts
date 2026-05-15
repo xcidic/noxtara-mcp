@@ -77,7 +77,10 @@ export const extractBrunoTools = (collection: ReturnType<typeof parseBrunoCollec
     const method = asString(http.method)?.toUpperCase() ?? "GET"
     const urlTemplate = asString(http.url) ?? ""
     const bodyMode = asString(http.body)
-    const { pathTemplate, queryDefaults } = splitUrlTemplate(urlTemplate, collection.apiBaseUrlTemplate)
+    const { pathTemplate, queryDefaults } = splitUrlTemplate(
+      urlTemplate,
+      collection.apiBaseUrlTemplate,
+    )
 
     const params = Array.isArray(parsed.params) ? parsed.params.filter(isRecord) : []
     const extractedParams: Array<{

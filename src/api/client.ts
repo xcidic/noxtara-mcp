@@ -66,7 +66,10 @@ const applyBody = (
   }
 
   if (bodyMode === "text") {
-    return HttpClientRequest.bodyText(request, typeof body === "string" ? body : JSON.stringify(body))
+    return HttpClientRequest.bodyText(
+      request,
+      typeof body === "string" ? body : JSON.stringify(body),
+    )
   }
 
   if (typeof body === "string") {

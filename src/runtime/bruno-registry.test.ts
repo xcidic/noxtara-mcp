@@ -17,7 +17,9 @@ describe("Bruno runtime scope", () => {
   it("parses the main API collection by default", () => {
     const collection = parseBrunoCollection()
 
-    expect(collection.collectionDir).toContain("submodules/product-appsec-apidocs/main-api-collection")
+    expect(collection.collectionDir).toContain(
+      "submodules/product-appsec-apidocs/main-api-collection",
+    )
     expect(collection.requestCount).toBeGreaterThan(0)
   }, 60_000)
 })
