@@ -12,13 +12,6 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
 
 const asString = (value: unknown) => (typeof value === "string" ? value : undefined)
 
-const resolveProjectRoot = () => dirname(dirname(dirname(fileURLToPath(import.meta.url))))
-
-const getDefaultCollectionDir = () => join(resolveProjectRoot(), DEFAULT_COLLECTION_SUBPATH)
-
-const isRequestBruFile = (name: string) =>
-  name.endsWith(".bru") && name !== COLLECTION_FILE && name !== "folder.bru"
-
 const collectRequestBruFiles = (dir: string): string[] => {
   const files: string[] = []
   const entries = readdirSync(dir, { withFileTypes: true }).sort((a, b) =>
@@ -34,7 +27,12 @@ const collectRequestBruFiles = (dir: string): string[] => {
       files.push(...collectRequestBruFiles(fullPath))
       continue
     }
-    if (entry.isFile() && isRequestBruFile(entry.name)) {
+    if (
+      entry.isFile() &&
+      entry.name.endsWith(".bru") &&
+      entry.name !== COLLECTION_FILE &&
+      entry.name !== "folder.bru"
+    ) {
       files.push(fullPath)
     }
   }
@@ -53,7 +51,8 @@ const extractApiBaseUrlTemplate = (collection: ReturnType<typeof collectionBruTo
 }
 
 export const parseBrunoCollection = () => {
-  const collectionDir = getDefaultCollectionDir()
+  const projectRoot = dirname(dirname(dirname(fileURLToPath(import.meta.url))))
+  const collectionDir = join(projectRoot, DEFAULT_COLLECTION_SUBPATH)
 
   if (!existsSync(collectionDir)) {
     throw new Error(`Bruno collection not found at ${collectionDir}`)

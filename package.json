@@ -41,7 +41,8 @@
     "prepack": "pnpm run build",
     "release": "bumpp && npm publish",
     "start": "node src/cli.ts",
-    "start:mcp": "node src/cli.ts serve-mcp",
+    "mcp": "node src/cli.ts mcp",
+    "mcp-http": "node src/cli.ts mcp-http",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },

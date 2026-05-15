@@ -2,14 +2,10 @@
   "$schema": "https://opencode.ai/config.json",
   "mcp": {
     "noxtara": {
-      "type": "local",
-      "command": ["pnpm", "run", "start:mcp"],
+      "type": "remote",
+      "url": "http://localhost:3434",
       "enabled": true,
-      "timeout": 60000,
-      "environment": {
-        "NOXTARA_API_BASE_URL": "{env:NOXTARA_API_BASE_URL}",
-        "NOXTARA_PAT": "{env:NOXTARA_PAT}"
-      }
+      "timeout": 60000
     }
   }
 }

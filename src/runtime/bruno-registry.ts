@@ -5,9 +5,6 @@ import { invokeHttpBinding } from "../api/client.ts"
 import { extractBrunoTools } from "./bruno-extract.ts"
 import { parseBrunoCollection } from "./bruno-parse.ts"
 
-const renderPayload = (value: unknown) =>
-  typeof value === "string" ? value : JSON.stringify(value ?? null, null, 2)
-
 const resolveBaseUrl = (
   collectionBaseUrl: string | undefined,
   overrideBaseUrl: string | undefined,
@@ -20,11 +17,6 @@ const resolveBaseUrl = (
     )
   }
   return candidate
-}
-
-const decodeInput = (schema: Schema.Top, args: unknown) => {
-  const decode = Schema.decodeUnknownSync(schema as never)
-  return decode(args)
 }
 
 type RegistryTool = ReturnType<typeof extractBrunoTools>[number]
@@ -94,7 +86,7 @@ export const createBrunoRegistry = (options?: {
         throw new Error(`Unknown tool "${name}"`)
       }
 
-      const args = decodeInput(tool.inputSchema, rawArgs)
+      const args = Schema.decodeUnknownSync(tool.inputSchema as never)(rawArgs)
       const pat = invokeOptions?.pat ?? process.env.NOXTARA_PAT
       if (!pat) {
         throw new Error("Missing PAT. Set NOXTARA_PAT to authenticate API requests.")
@@ -126,7 +118,10 @@ export const createBrunoRegistry = (options?: {
               content: [
                 {
                   type: "text" as const,
-                  text: renderPayload(payload),
+                  text:
+                    typeof payload === "string"
+                      ? payload
+                      : JSON.stringify(payload ?? null, null, 2),
                 },
               ],
               raw: {

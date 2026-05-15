@@ -19,8 +19,6 @@ const parseDocs = (value: unknown) => {
   return undefined
 }
 
-const firstLine = (text: string | undefined) => text?.trim().split("\n")[0]?.trim()
-
 const sanitizeToolName = (name: string) => {
   const normalized = name
     .toLowerCase()
@@ -146,7 +144,7 @@ export const extractBrunoTools = (collection: ReturnType<typeof parseBrunoCollec
     usedNames.set(candidateName, count + 1)
     const name = count === 0 ? candidateName : `${candidateName}_${count + 1}`
 
-    const description = firstLine(docs) ?? `${method} ${pathTemplate}`
+    const description = docs?.trim().split("\n")[0]?.trim() ?? `${method} ${pathTemplate}`
     const displayName = asString(meta.name) ?? rawName
 
     tools.push({

@@ -5,8 +5,6 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
 
 const asString = (value: unknown) => (typeof value === "string" ? value : undefined)
 
-const looksLikeBoolean = (value: string) => value === "true" || value === "false"
-
 const inferScalarSchema = (sampleValue: unknown): Schema.Top => {
   if (typeof sampleValue === "boolean") {
     return Schema.Boolean
@@ -16,7 +14,8 @@ const inferScalarSchema = (sampleValue: unknown): Schema.Top => {
   }
   if (typeof sampleValue === "string") {
     const trimmed = sampleValue.trim()
-    if (looksLikeBoolean(trimmed.toLowerCase())) {
+    const lower = trimmed.toLowerCase()
+    if (lower === "true" || lower === "false") {
       return Schema.Boolean
     }
     const numeric = Number(trimmed)
@@ -51,18 +50,6 @@ const inferJsonSchema = (value: unknown): Schema.Top => {
   return inferScalarSchema(value)
 }
 
-const parseSampleJson = (sample: unknown) => {
-  const text = asString(sample)
-  if (!text) {
-    return undefined
-  }
-  try {
-    return JSON.parse(text)
-  } catch {
-    return undefined
-  }
-}
-
 const buildMultipartBodySchema = (
   parts: Array<Record<string, unknown>>,
   bodyRequired: boolean,
@@ -88,7 +75,15 @@ const buildBodyFieldSchema = (
   body: Record<string, unknown>,
 ): Schema.Top | undefined => {
   if (bodyMode === "json") {
-    const parsed = parseSampleJson(body.json)
+    let parsed: unknown
+    const text = asString(body.json)
+    if (text) {
+      try {
+        parsed = JSON.parse(text)
+      } catch {
+        parsed = undefined
+      }
+    }
     const inferred = parsed === undefined ? Schema.Unknown : inferJsonSchema(parsed)
     return Schema.optionalKey(inferred)
   }

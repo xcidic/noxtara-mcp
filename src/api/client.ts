@@ -6,11 +6,6 @@ import * as HttpClientRequest from "effect/unstable/http/HttpClientRequest"
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null
 
-const normalizeBaseUrl = (value: string) => value.replace(/\/+$/, "")
-
-const normalizeContentType = (value: string | undefined) =>
-  value?.split(";")[0]?.trim().toLowerCase() ?? ""
-
 const stringifyParamValue = (value: unknown) => {
   if (typeof value === "string") {
     return value
@@ -22,7 +17,7 @@ const stringifyParamValue = (value: unknown) => {
 }
 
 const isJsonContentType = (value: string | undefined) => {
-  const normalized = normalizeContentType(value)
+  const normalized = value?.split(";")[0]?.trim().toLowerCase() ?? ""
   return (
     normalized === "application/json" ||
     normalized.includes("+json") ||
@@ -126,7 +121,7 @@ export const invokeHttpBinding = (
   Effect.gen(function* () {
     const client = yield* HttpClient.HttpClient
     const resolvedPath = resolvePathTemplate(binding.pathTemplate, binding.params, args)
-    const baseUrl = normalizeBaseUrl(options.baseUrl)
+    const baseUrl = options.baseUrl.replace(/\/+$/, "")
     const url = `${baseUrl}${resolvedPath.startsWith("/") ? resolvedPath : `/${resolvedPath}`}`
 
     let request = makeRequest(binding.method, url)

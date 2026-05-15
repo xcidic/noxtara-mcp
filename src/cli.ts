@@ -9,20 +9,12 @@ import * as Schema from "effect/Schema"
 import { Argument, Command, Flag } from "effect/unstable/cli"
 import { NodeRuntime, NodeServices } from "@effect/platform-node"
 
-import { serveNoxtaraMcp } from "./mcp/server.ts"
+import { serveNoxtaraMcp, serveNoxtaraMcpHttp } from "./mcp/server.ts"
 import { createBrunoRegistry } from "./runtime/bruno-registry.ts"
-
-const formatError = (error: unknown) => (error instanceof Error ? error.message : String(error))
 
 class CliCommandError extends Data.TaggedError("CliCommandError")<{
   message: string
 }> {}
-
-const parseJsonInput = (value: string) =>
-  Effect.try({
-    try: () => Schema.decodeSync(Schema.UnknownFromJsonString)(value),
-    catch: (error) => new CliCommandError({ message: `Invalid JSON input: ${formatError(error)}` }),
-  })
 
 const search = Flag.string("search").pipe(
   Flag.optional,
@@ -58,13 +50,22 @@ const input = Flag.string("input").pipe(
 const toolsInvokeCommand = Command.make("invoke", { toolName, input }, ({ toolName, input }) =>
   Effect.gen(function* () {
     const registry = createBrunoRegistry()
-    const parsedInput = yield* parseJsonInput(input)
+    const parsedInput = yield* Effect.try({
+      try: () => Schema.decodeSync(Schema.UnknownFromJsonString)(input),
+      catch: (error) =>
+        new CliCommandError({
+          message: `Invalid JSON input: ${error instanceof Error ? error.message : String(error)}`,
+        }),
+    })
     const result = yield* Effect.tryPromise({
       try: () => registry.invokeTool(toolName, parsedInput),
-      catch: (error) => new CliCommandError({ message: formatError(error) }),
+      catch: (error) =>
+        new CliCommandError({ message: error instanceof Error ? error.message : String(error) }),
     })
     yield* Console.log(result.content[0]?.text ?? "")
-  }).pipe(Effect.catch((error) => Console.error(formatError(error)))),
+  }).pipe(
+    Effect.catch((error) => Console.error(error instanceof Error ? error.message : String(error))),
+  ),
 ).pipe(Command.withDescription("Invoke one tool by name"))
 
 const toolsCommand = Command.make("tools", {}).pipe(
@@ -72,19 +73,41 @@ const toolsCommand = Command.make("tools", {}).pipe(
   Command.withSubcommands([toolsListCommand, toolsInvokeCommand]),
 )
 
-const serveMcpCommand = Command.make("serve-mcp", {}, () =>
+const port = Flag.integer("port").pipe(
+  Flag.withAlias("p"),
+  Flag.withDescription("HTTP server port"),
+  Flag.withDefault(3434),
+)
+
+const mcpCommand = Command.make("mcp", {}, () =>
   Effect.gen(function* () {
-    yield* Console.log("Starting MCP server on stdio...")
+    yield* Console.error("Starting MCP server on stdio...")
     yield* Effect.tryPromise({
       try: () => serveNoxtaraMcp(),
-      catch: (error) => new CliCommandError({ message: formatError(error) }),
+      catch: (error) =>
+        new CliCommandError({ message: error instanceof Error ? error.message : String(error) }),
     })
-  }).pipe(Effect.catch((error) => Console.error(formatError(error)))),
+  }).pipe(
+    Effect.catch((error) => Console.error(error instanceof Error ? error.message : String(error))),
+  ),
 ).pipe(Command.withDescription("Run MCP server over stdio"))
+
+const mcpHttpCommand = Command.make("mcp-http", { port }, ({ port }) =>
+  Effect.gen(function* () {
+    yield* Console.error(`Starting MCP HTTP server on port ${port}...`)
+    yield* Effect.tryPromise({
+      try: () => serveNoxtaraMcpHttp({ port }),
+      catch: (error) =>
+        new CliCommandError({ message: error instanceof Error ? error.message : String(error) }),
+    })
+  }).pipe(
+    Effect.catch((error) => Console.error(error instanceof Error ? error.message : String(error))),
+  ),
+).pipe(Command.withDescription("Run MCP server over HTTP"))
 
 const command = Command.make("pkg-placeholder", {}).pipe(
   Command.withDescription("Noxtara MCP CLI"),
-  Command.withSubcommands([toolsCommand, serveMcpCommand]),
+  Command.withSubcommands([toolsCommand, mcpCommand, mcpHttpCommand]),
 )
 
 const cli = Command.run(command, {

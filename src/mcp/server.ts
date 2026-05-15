@@ -1,8 +1,31 @@
-import { McpServer, StdioServerTransport, fromJsonSchema } from "@modelcontextprotocol/server"
+import { createServer } from "node:http"
+
+import { McpServer, StdioServerTransport, WebStandardStreamableHTTPServerTransport, fromJsonSchema } from "@modelcontextprotocol/server"
 
 import { createBrunoRegistry } from "../runtime/bruno-registry.ts"
 
-const formatError = (error: unknown) => (error instanceof Error ? error.message : String(error))
+const readBody = (req: import("node:http").IncomingMessage): Promise<Uint8Array | undefined> => {
+  if (req.method === "GET" || req.method === "HEAD") return Promise.resolve(undefined)
+  return new Promise((resolve, reject) => {
+    const chunks: Buffer[] = []
+    req.on("data", (chunk: Buffer) => chunks.push(chunk))
+    req.on("end", () => resolve(chunks.length > 0 ? Buffer.concat(chunks) : undefined))
+    req.on("error", reject)
+  })
+}
+
+const toWebHeaders = (nodeHeaders: import("node:http").IncomingHttpHeaders): Headers => {
+  const headers = new Headers()
+  for (const [key, value] of Object.entries(nodeHeaders)) {
+    if (value === undefined) continue
+    if (Array.isArray(value)) {
+      for (const v of value) headers.append(key, v)
+    } else {
+      headers.set(key, value)
+    }
+  }
+  return headers
+}
 
 export const createNoxtaraMcpServer = (options?: { baseUrl?: string; pat?: string }) => {
   const registryOptions = options?.baseUrl ? { baseUrl: options.baseUrl } : undefined
@@ -28,7 +51,12 @@ export const createNoxtaraMcpServer = (options?: { baseUrl?: string; pat?: strin
         } catch (error) {
           return {
             isError: true,
-            content: [{ type: "text" as const, text: formatError(error) }],
+            content: [
+              {
+                type: "text" as const,
+                text: error instanceof Error ? error.message : String(error),
+              },
+            ],
           }
         }
       },
@@ -45,4 +73,66 @@ export const serveNoxtaraMcp = async (options?: { baseUrl?: string; pat?: string
   const { server } = createNoxtaraMcpServer(options)
   const transport = new StdioServerTransport()
   await server.connect(transport)
+}
+
+const pipeWebResponseToNode = async (webResponse: Response, res: import("node:http").ServerResponse) => {
+  const statusText = webResponse.statusText || undefined
+  res.writeHead(webResponse.status, statusText, Object.fromEntries(webResponse.headers))
+
+  if (webResponse.body) {
+    const reader = webResponse.body.getReader()
+    try {
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) { res.end(); return }
+        res.write(value)
+      }
+    } catch {
+      res.end()
+    }
+  } else {
+    res.end()
+  }
+}
+
+export const serveNoxtaraMcpHttp = async (options?: {
+  baseUrl?: string
+  pat?: string
+  port?: number
+}) => {
+  const { server: mcpServer } = createNoxtaraMcpServer(options)
+  const port = options?.port ?? 3434
+
+  const transport = new WebStandardStreamableHTTPServerTransport({
+    sessionIdGenerator: () => crypto.randomUUID(),
+  })
+  await mcpServer.connect(transport)
+
+  const httpServer = createServer(async (req, res) => {
+    try {
+      const body = await readBody(req)
+      const url = new URL(req.url ?? "/", `http://${req.headers.host ?? "localhost"}`)
+
+      const webResponse = await transport.handleRequest(
+        new Request(url, {
+          method: req.method ?? "GET",
+          headers: toWebHeaders(req.headers),
+          body: body ?? null,
+        }),
+      )
+
+      await pipeWebResponseToNode(webResponse, res)
+    } catch (error) {
+      console.error(error)
+      res.writeHead(500)
+      res.end("Internal Server Error")
+    }
+  })
+
+  return new Promise<void>((resolve) => {
+    httpServer.listen(port, () => {
+      console.error(`MCP HTTP server listening on http://localhost:${port}`)
+      resolve()
+    })
+  })
 }
