@@ -26,3 +26,4 @@ Available references:
 - effect-smol — Effect v4
 - product-appsec-fe — Noxtara Web Frontend
 - mcp-typescript-sdk — MCP TypeScript SDK
+- executor — Executor (parse -> IR -> tools reference)

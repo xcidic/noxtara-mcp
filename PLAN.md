@@ -2,10 +2,35 @@
 
 ## Goal
 
-Wrap the Noxtara (Product AppSec) **Main API** as typed, composable Effect functions, then expose them as:
+Expose Noxtara (Product AppSec) Main API as:
 
-- **MCP tools** (via `@modelcontextprotocol/server`) — for AI assistants (Claude, Copilot, etc.)
-- **CLI commands** (via `effect/unstable/cli`) — for human use
+- MCP tools (for AI agents)
+- CLI commands (for humans)
+
+while keeping implementation fast to iterate as Bruno docs evolve.
+
+## Current Direction (MVP)
+
+We are using:
+
+**Bruno `.bru` -> parse -> IR -> tools**
+
+and explicitly **not** doing an OpenAPI intermediary for Main API in v1.
+
+### In scope now
+
+- Dynamic parse of Bruno collection at startup
+- Runtime IR generation per endpoint
+- Dynamic MCP tool registration from IR
+- Generic executor shared by MCP and CLI
+- Dynamic **input schema** generation (Effect Schema + JSON Schema output for MCP)
+
+### Out of scope now
+
+- Output schema generation / strict response typing
+- Tool-name normalization beyond minimum protocol-safe sanitizing
+- Build-time codegen
+- OpenAPI export/import pipeline for Main API
 
 ## Stack
 
@@ -14,190 +39,137 @@ Wrap the Noxtara (Product AppSec) **Main API** as typed, composable Effect funct
 | Language        | TypeScript (ESM, strict)                         |
 | Effect system   | Effect v4 (`effect`, `@effect/platform-node`)    |
 | HTTP client     | `@effect/platform` `HttpClient`                  |
-| Schema          | Effect `Schema` / Zod                            |
+| Schema          | Effect `Schema`                                  |
 | MCP SDK         | `@modelcontextprotocol/server` (stdio transport) |
-| CLI             | `effect/unstable/cli` (already scaffolded)       |
-| Build           | `tsdown` → ESM                                   |
-| API docs source | Bruno `.bru` collections                         |
+| CLI             | `effect/unstable/cli`                            |
+| Build           | `tsdown` -> ESM                                  |
+| API docs source | Bruno `.bru` collection                          |
 
 ## Sources of Truth
 
-1. **API docs** — `submodules/product-appsec-apidocs/main-api-collection/` — canonical. Bruno `.bru` files with method, URL, params, body, docs, response examples.
-2. **OpenAPI specs** — Tokenizer, OSINT Scanner, DNS Twist microservices have live `/openapi.json`. Main API does not.
-3. **Frontend types** — `.references/product-appsec-fe/packages/frontend/src/services/api/` — hand-written TS types for reference.
+1. `submodules/product-appsec-apidocs/main-api-collection/` (canonical docs + examples)
+2. Main API behavior itself (runtime responses)
+3. Frontend references in `.references/product-appsec-fe` (optional hints)
 
-## .bru File Format
+## Bruno Notes
 
-A Bruno `.bru` file is a custom DSL with blocks:
+Bruno requests provide structured pieces we can map directly:
 
-```
-meta { name, type, seq }
-get/post/put/patch/delete { url, body, auth }
-params:path { key: value }
-params:query { key: value }
-body:json { JSON }
-headers { key: value }
-docs { free text docs }
-example { name, request, response }
-```
+- meta: `name`, `type`, `seq`
+- http: method, URL template, auth/body mode
+- params: path/query params (with enabled flags and sample values)
+- body blocks (`body:json`, etc.)
+- headers
+- docs
+- examples
 
-Parsable via `@usebruno/lang` (`bruToJsonV2`, `collectionBruToJson`).
+Important: examples are useful hints, but not strict contracts.
 
-## Target: Main API Surface
+## IR Design (MVP)
 
-~27 feature areas, ~100 endpoints. Priority areas:
+Use a two-layer IR inspired by executor-style separation:
 
-| Area                | Key Endpoints                                                  |
-| ------------------- | -------------------------------------------------------------- |
-| **ASM**             | List, Create, Get detail, Delete, Scan triggers, Findings list |
-| **DAST**            | List, Create, Get, Scan triggers, Alerts list, Paths           |
-| **SCA/SAST**        | List, Create, Get, Alerts list, Secrets list, GitHub status    |
-| **Mobile Security** | List, Create, Get, Alerts                                      |
-| **WAF**             | List, Create, Get, Scan, Results                               |
-| **VPN/IoT Scanner** | List entries                                                   |
-| **Alerts**          | List, Get, Update                                              |
-| **Risk**            | Get by alert, Update, Team summary                             |
-| **Summary**         | Issues, Assets, Vulnerabilities per type, Events               |
-| **Account**         | Get/Update profile, 2FA channels                               |
-| **Notification**    | List, Channels, Rules CRUD                                     |
-| **API Manager**     | API keys CRUD, verify                                          |
-| **Team**            | Create, Join, Members, Domains, Join requests                  |
-| **Dictionary**      | Explain vulnerability                                          |
-| **Report**          | Generate, Get report doc                                       |
-| **Enrichment**      | Extract terms, Get definitions                                 |
-| **LLM**             | List, Create, Get, Vulnerabilities                             |
-| **News Directory**  | Team news, Keywords                                            |
-| **Admin**           | Teams CRUD, Users CRUD, Subscriptions, Usage                   |
+1. **Tool Definition IR (rich)**
+   - name
+   - description
+   - input schema
+   - execution metadata (method, URL template, params/body info)
 
-## Experimentation: Bruno at runtime (no codegen)
+2. **Execution Binding (lean)**
+   - only data needed to execute HTTP call reliably
+   - used by generic invoke path
 
-We skip build-time code generation (`scripts/codegen.ts` → `src/generated/*`). Full codegen into Effect Schemas and per-endpoint TS is high effort and brittle when `.bru` changes.
+This keeps registration concerns separate from invocation concerns.
 
-**Approach:** At MCP (or CLI) startup, load the Main API Bruno collection from disk, parse with `@usebruno/lang` (`bruToJsonV2` / `collectionBruToJson`), and build a **runtime registry**: method, URL template, path/query/body/header slots, optional `docs` / `example` text.
+## Runtime Flow
 
-From that registry:
-
-- **MCP:** Register tools dynamically (one tool per request, or grouped by folder if too many). Handlers interpolate params into the URL, attach JSON body when present, call `HttpClient`, return text + optional loose JSON for `structuredContent`.
-- **Typing:** Prefer inference and small shared helpers over generated `Schema` types until specific endpoints need hardening.
-- **Iteration:** Change `.bru` in `product-appsec-apidocs`, restart the server — no regenerate step.
-
-Hand-written `src/api/*.ts` modules remain optional later for hot paths that deserve strict schemas and tests.
+1. Parse collection + request files from `main-api-collection`
+2. Extract endpoint IR rows
+3. Build Effect input schemas dynamically
+4. Convert input schemas to JSON schema for MCP registration
+5. Register one MCP tool per request
+6. Invoke through one generic HTTP executor
+7. Return text-first results (+ optional raw structured payload)
 
 ## Architecture
 
-```
+```txt
 src/
-├── api/                 # Effect-wrapped HTTP client for Main API
-│   ├── client.ts        # Base client (base URL, JWT auth, error handling)
-│   ├── asm.ts           # ASM endpoints
-│   ├── dast.ts          # DAST endpoints
-│   ├── scaSast.ts       # SCA/SAST endpoints
-│   ├── alerts.ts
-│   ├── risk.ts
-│   ├── summary.ts
-│   ├── account.ts
-│   ├── admin.ts
-│   ├── dictionary.ts
-│   ├── enrichment.ts
-│   ├── llm.ts
-│   ├── mobile.ts
-│   ├── notification.ts
-│   ├── apiManager.ts
-│   ├── team.ts
-│   ├── vpn.ts
-│   ├── iot.ts
-│   ├── waf.ts
-│   ├── report.ts
-│   ├── news.ts
-│   └── index.ts         # Re-exports all API modules
-├── mcp/
-│   └── server.ts        # MCP server: stdio transport; tools from runtime Bruno registry (+ optional manual tools)
+├── api/
+│   └── client.ts          # shared HTTP client + auth + envelope/error mapping
 ├── runtime/
-│   └── brunoRegistry.ts # Load & parse `.bru` collection → endpoint metadata + generic executor
-├── cli.ts               # Extended CLI: all API operations as subcommands
-├── main.ts              # Library exports
-└── schemas/
-    └── asm.ts           # (optional) Shared Zod schemas for request/response shapes
+│   ├── bruno-parse.ts      # walk collection + parse .bru files
+│   ├── bruno-extract.ts    # parse output -> IR
+│   ├── bruno-schemas.ts    # dynamic Effect Schema builders (input only)
+│   └── bruno-registry.ts   # IR registry + executor bindings
+├── mcp/
+│   └── server.ts          # register tools from runtime registry
+├── cli.ts                 # dispatch using same registry/executor
+└── main.ts
 ```
 
-### API Client Layer (`src/api/`)
+File splits can be adjusted, but these boundaries should hold.
 
-**Experimentation path:** a single shared `HttpClient` + envelope decode is enough; the Bruno registry’s generic executor calls into that. **Optional later:** per-area modules export typed Effect functions, e.g.:
+## MCP Behavior (MVP)
 
-```ts
-// src/api/asm.ts
-export const listAsmEntries = (teamId: string, params?: { offset?; limit?; sort?; order? }) =>
-  Effect.request(HttpClient.get(`/asm/${teamId}`, { params })).pipe(
-    Effect.flatMap(decodeResponse(ListAsmEntriesResponse)),
-  )
-```
+- Tool count: one per Bruno request
+- Tool description: `docs` first line, fallback to method + path
+- Input schema: generated at runtime from params/body
+- Output schema: omitted for now
+- Response payload:
+  - `content` text always present
+  - optional raw JSON object in structured field if available
+- API/business errors should be returned as tool errors (`isError: true`) rather than protocol failure when possible
 
-- JWT token from config (env var, or pass in at startup)
-- Consistent error handling: decode `{ statusCode, success, message, data }` envelope
-- Stricter response decoding can come later from `.bru` `example` blocks or hand-written schemas where it pays off
+## CLI Behavior (MVP)
 
-### MCP Layer (`src/mcp/server.ts`)
-
-```ts
-import { McpServer } from "@modelcontextprotocol/server"
-
-const mcp = new McpServer({ name: "noxtara-mcp", version: "0.1.0" })
-
-// Either: loop `for (const ep of await loadBrunoRegistry())` and registerTool per endpoint
-// Or: keep a few hand-written tools and add dynamic ones from the registry
-mcp.registerTool("asm_list_entries", {
-  description: "List ASM entries for a team",
-  inputSchema: z.object({ teamId: z.string(), offset: z.number().optional(), ... })
-}, async ({ teamId, ... }) => {
-  const result = await listAsmEntries(teamId, ...)
-  return { content: [{ type: "text", text: JSON.stringify(result) }] }
-})
-```
-
-Registration is primarily **driven by the runtime Bruno registry** (tool name, description from `docs`, input shape from parsed params). A thin generic executor performs the HTTP call; hand-written `registerTool` stays possible for special cases. Output = `CallToolResult` with `content` (text) and optional `structuredContent`.
-
-### CLI Layer (`src/cli.ts`)
-
-Extend existing Effect CLI with subcommands mirroring the API modules:
-
-```
-noxtara asm list <teamId>
-noxtara asm get <teamId> <entryId>
-noxtara dast alerts <teamId> <entryId>
-...
-```
+- Reuse the same registry and generic executor
+- Initial UX can be simple:
+  - grouped commands by folder or direct operation path
+- Fancy command ergonomics are phase-2
 
 ## Implementation Phases
 
-### Phase 1 — Foundation
+### Phase 1 — Parse and IR
 
-- [ ] Set up `product-appsec-apidocs` and `product-appsec-fe` as Git submodules (replacing `scripts/references.ts`).
-- [ ] Install `@usebruno/lang` and `@modelcontextprotocol/server`.
-- [ ] Implement `src/runtime/brunoRegistry.ts` — walk `main-api-collection`, parse `.bru` at startup, expose normalized endpoint list + generic `executeRequest(ep, args)`.
-- [ ] Build `src/api/client.ts` — Effect `HttpClient` with JWT auth, base URL, error envelope handling (used by the generic executor).
-- [ ] Prove the loop on ASM folder first (most complex, representative), then expand to full collection.
+- [ ] Implement recursive `.bru` discovery for request files
+- [ ] Parse each request with `@usebruno/lang`
+- [ ] Build Tool Definition IR + Execution Binding
+- [ ] Keep names close to Bruno (no big renaming strategy)
 
-### Phase 2 — MCP Server
+### Phase 2 — Dynamic Input Schemas
 
-- [ ] Build `src/mcp/server.ts` — stdio transport, register tools from Bruno registry (ASM first), test
-- [ ] Expand registry coverage to the rest of the Main API collection (same dynamic registration pattern)
-- [ ] Handle auth: accept JWT token via env var or MCP config
+- [ ] Build Effect input schemas dynamically from:
+  - path/query params
+  - request body presence and mode
+  - selected headers only if needed
+- [ ] Export JSON schema documents for MCP registration
+- [ ] Validate call arguments before execution
 
-### Phase 3 — CLI
+### Phase 3 — MCP Integration
 
-- [ ] Extend `src/cli.ts` — either dispatch through the same Bruno registry as MCP, or add subcommands per area once typed `src/api/*` exists
-- [ ] Reuse `src/api/client.ts` (and optional per-module helpers) so CLI and MCP share one HTTP stack
+- [ ] Implement `src/mcp/server.ts` dynamic registration loop
+- [ ] Add generic invoke handler (`binding + args -> HTTP call`)
+- [ ] Wire PAT auth via env (`NOXTARA_PAT`) with `x-pat` header
+- [ ] Prove on ASM first, then expand to whole collection
 
-### Phase 4 — Polish
+### Phase 4 — CLI Integration
 
-- [ ] Add remaining API areas (Admin, Notification, API Manager, Team, etc.)
-- [ ] Output schemas (`structuredContent`) for structured tool results
-- [ ] Error handling, pagination support
-- [ ] Tests (via `@effect/vitest`)
+- [ ] Reuse registry/executor in CLI command surface
+- [ ] Keep command UX minimal but discoverable
 
-## Key Design Decisions
+### Phase 5 — Hardening
 
-1. **Auth**: Main API uses JWT Bearer token. Accept via `NOXTARA_JWT_TOKEN` env var. No login flow in v1.
-2. **Team scoping**: Every tool accepts `teamId` as an explicit parameter rather than a global config.
-3. **Response format**: Tool results return `{ content: [{ type: "text", text }], structuredContent: { ... } }` — structured for programmatic use, text for LLM readability.
-4. **Error handling**: API errors (`success: false`) → `isError: true` in tool result, not MCP protocol errors (so LLM can see and self-correct).
+- [ ] Improve envelope/error formatting consistency
+- [ ] Add pagination helpers for common list endpoints
+- [ ] Add tests for parser/extractor/schema generation
+- [ ] Add optional output schema generation later (only where useful)
+
+## Key Decisions
+
+1. Main API source of truth is Bruno, not OpenAPI.
+2. OpenAPI intermediary is deferred.
+3. Input schemas now; output schemas later.
+4. No name-normalization strategy in MVP.
+5. Single generic executor first; area-specific typed clients are optional later.
+6. `teamId` remains explicit in tool inputs for scoped operations.

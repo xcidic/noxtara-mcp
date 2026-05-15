@@ -41,11 +41,14 @@
     "prepack": "pnpm run build",
     "release": "bumpp && npm publish",
     "start": "node src/cli.ts",
+    "start:mcp": "node src/cli.ts serve-mcp",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@cfworker/json-schema": "^4.1.1",
     "@effect/platform-node": "^4.0.0-beta.59",
+    "@modelcontextprotocol/server": "2.0.0-alpha.2",
     "@usebruno/lang": "file:submodules/bruno/packages/bruno-lang",
     "effect": "^4.0.0-beta.59"
   },

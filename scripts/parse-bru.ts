@@ -76,14 +76,10 @@ for (const file of bruFiles) {
     }
 
     if (pathParams.length) {
-      console.log(
-        `  Path params:  ${pathParams.map(formatParam).join(", ")}`,
-      )
+      console.log(`  Path params:  ${pathParams.map(formatParam).join(", ")}`)
     }
     if (queryParams.length) {
-      console.log(
-        `  Query params: ${queryParams.map(formatParam).join(", ")}`,
-      )
+      console.log(`  Query params: ${queryParams.map(formatParam).join(", ")}`)
     }
     if (asString(body.json)) {
       console.log(`  Body:   JSON present`)
@@ -97,15 +93,12 @@ for (const file of bruFiles) {
       const response = isRecord(ex) && isRecord(ex.response) ? ex.response : undefined
       const responseBody = response && isRecord(response.body) ? response.body : undefined
       const responseContent = asString(responseBody?.content)
-      const status =
-        response && isRecord(response.status) ? response.status : undefined
+      const status = response && isRecord(response.status) ? response.status : undefined
 
       if (responseContent) {
         const statusCode = asString(status?.code) ?? status?.code ?? "?"
         const statusText = asString(status?.text) ?? ""
-        console.log(
-          `  Resp:   ${statusCode} ${statusText} (${responseContent.length} bytes JSON)`,
-        )
+        console.log(`  Resp:   ${statusCode} ${statusText} (${responseContent.length} bytes JSON)`)
       }
     }
     console.log("")

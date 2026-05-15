@@ -15,8 +15,8 @@ declare module "@usebruno/lang" {
   }
 
   interface BrunoExampleResponse extends BrunoObject {
-    status?: ({ code?: string | number; text?: string } & BrunoObject)
-    body?: ({ content?: string } & BrunoObject)
+    status?: { code?: string | number; text?: string } & BrunoObject
+    body?: { content?: string } & BrunoObject
   }
 
   interface BrunoExample extends BrunoObject {

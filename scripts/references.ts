@@ -27,6 +27,11 @@ const repositories = [
     directory: "mcp-typescript-sdk",
     url: "https://github.com/modelcontextprotocol/typescript-sdk.git",
   },
+  {
+    name: "Executor",
+    directory: "executor",
+    url: "https://github.com/RhysSullivan/executor.git",
+  },
 ] satisfies ReadonlyArray<ReferenceRepository>
 
 const scriptDir = dirname(fileURLToPath(import.meta.url))
