@@ -32,6 +32,19 @@ const toWebHeaders = (nodeHeaders: import("node:http").IncomingHttpHeaders): Hea
   return headers
 }
 
+const extractPatFromMcpPath = (
+  pathname: string,
+): { pat: string } | { status: number; error: string } => {
+  const parts = pathname.split("/").filter(Boolean)
+  if (parts[0] !== "mcp") {
+    return { status: 404, error: "Not Found" }
+  }
+  if (parts.length !== 2 || !parts[1]) {
+    return { status: 401, error: "Missing PAT in MCP path. Use /mcp/<pat>." }
+  }
+  return { pat: decodeURIComponent(parts[1]) }
+}
+
 export const createNoxtaraMcpServer = (options?: { baseUrl?: string; pat?: string }) => {
   const registryOptions = options?.baseUrl ? { baseUrl: options.baseUrl } : undefined
   const registry = createBrunoRegistry(registryOptions)
@@ -49,9 +62,10 @@ export const createNoxtaraMcpServer = (options?: { baseUrl?: string; pat?: strin
         description: tool.description,
         inputSchema: fromJsonSchema(tool.inputJsonSchema),
       },
-      async (args) => {
+      async (args, ctx) => {
         try {
-          const invokeOptions = options?.pat ? { pat: options.pat } : undefined
+          const pat = ctx.http?.authInfo?.token ?? options?.pat
+          const invokeOptions = pat ? { pat } : undefined
           return await registry.invokeTool(tool.name, args ?? {}, invokeOptions)
         } catch (error) {
           return {
@@ -123,6 +137,12 @@ export const serveNoxtaraMcpHttp = async (options?: {
     try {
       const body = await readBody(req)
       const url = new URL(req.url ?? "/", `http://${req.headers.host ?? "localhost"}`)
+      const pathAuth = extractPatFromMcpPath(url.pathname)
+      if ("error" in pathAuth) {
+        res.writeHead(pathAuth.status)
+        res.end(pathAuth.error)
+        return
+      }
 
       const webResponse = await transport.handleRequest(
         new Request(url, {
@@ -130,6 +150,13 @@ export const serveNoxtaraMcpHttp = async (options?: {
           headers: toWebHeaders(req.headers),
           body: body ?? null,
         }),
+        {
+          authInfo: {
+            token: pathAuth.pat,
+            clientId: "url-pat",
+            scopes: [],
+          },
+        },
       )
 
       await pipeWebResponseToNode(webResponse, res)
@@ -142,7 +169,7 @@ export const serveNoxtaraMcpHttp = async (options?: {
 
   return new Promise<void>((resolve) => {
     httpServer.listen(port, () => {
-      console.error(`MCP HTTP server listening on http://localhost:${port}`)
+      console.error(`MCP HTTP server listening on http://localhost:${port}/mcp/<pat>`)
       resolve()
     })
   })
