@@ -10,7 +10,7 @@ import { Argument, Command, Flag } from "effect/unstable/cli"
 import { NodeRuntime, NodeServices } from "@effect/platform-node"
 
 import { serveNoxtaraMcp, serveNoxtaraMcpHttp } from "./mcp/server.ts"
-import { createBrunoRegistry } from "./runtime/bruno-registry.ts"
+import { createOpenApiRegistry } from "./runtime/openapi/registry.ts"
 
 class CliCommandError extends Data.TaggedError("CliCommandError")<{
   message: string
@@ -23,7 +23,7 @@ const search = Flag.string("search").pipe(
 
 const toolsListCommand = Command.make("list", { search }, ({ search }) =>
   Effect.gen(function* () {
-    const registry = createBrunoRegistry()
+    const registry = createOpenApiRegistry()
     const filter = Option.getOrUndefined(search)?.toLowerCase()
     const tools = registry
       .listTools()
@@ -38,7 +38,7 @@ const toolsListCommand = Command.make("list", { search }, ({ search }) =>
       yield* Console.log(`${tool.name} - ${tool.description}`)
     }
   }),
-).pipe(Command.withDescription("List discovered Bruno tools"))
+).pipe(Command.withDescription("List discovered OpenAPI tools"))
 
 const toolName = Argument.string("tool")
 const input = Flag.string("input").pipe(
@@ -49,7 +49,7 @@ const input = Flag.string("input").pipe(
 
 const toolsInvokeCommand = Command.make("invoke", { toolName, input }, ({ toolName, input }) =>
   Effect.gen(function* () {
-    const registry = createBrunoRegistry()
+    const registry = createOpenApiRegistry()
     const parsedInput = yield* Effect.try({
       try: () => Schema.decodeSync(Schema.UnknownFromJsonString)(input),
       catch: (error) =>
@@ -69,7 +69,7 @@ const toolsInvokeCommand = Command.make("invoke", { toolName, input }, ({ toolNa
 ).pipe(Command.withDescription("Invoke one tool by name"))
 
 const toolsCommand = Command.make("tools", {}).pipe(
-  Command.withDescription("Bruno-derived tool commands"),
+  Command.withDescription("OpenAPI-derived tool commands"),
   Command.withSubcommands([toolsListCommand, toolsInvokeCommand]),
 )
 

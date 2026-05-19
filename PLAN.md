@@ -13,24 +13,24 @@ while keeping implementation fast to iterate as Bruno docs evolve.
 
 We are using:
 
-**Bruno `.bru` -> parse -> IR -> tools**
+**Bruno `.bru` -> build-time OpenAPI -> parse -> IR -> tools**
 
-and explicitly **not** doing an OpenAPI intermediary for Main API in v1.
+Bruno is the authoring source of truth; a committed OpenAPI spec is generated at build time and loaded at runtime (no `.bru` parsing in production).
 
 ### In scope now
 
-- Dynamic parse of Bruno collection at startup
-- Runtime IR generation per endpoint
+- Load committed OpenAPI spec at startup (`specs/main-api.openapi.json`)
+- Runtime IR extraction per operation (executor-style OpenAPI extract)
 - Dynamic MCP tool registration from IR
 - Generic executor shared by MCP and CLI
-- Dynamic **input schema** generation (Effect Schema + JSON Schema output for MCP)
+- Input schemas from OpenAPI operation definitions (JSON Schema for MCP)
 
 ### Out of scope now
 
 - Output schema generation / strict response typing
 - Tool-name normalization beyond minimum protocol-safe sanitizing
-- Build-time codegen
-- OpenAPI export/import pipeline for Main API
+- Runtime Bruno parsing (build-time generation only via `pnpm run generate:openapi`)
+- Output schema generation / strict response typing
 
 ## Stack
 
@@ -83,28 +83,26 @@ This keeps registration concerns separate from invocation concerns.
 
 ## Runtime Flow
 
-1. Parse collection + request files from `main-api-collection`
-2. Extract endpoint IR rows
-3. Build Effect input schemas dynamically
-4. Convert input schemas to JSON schema for MCP registration
-5. Register one MCP tool per request
-6. Invoke through one generic HTTP executor
-7. Return text-first results (+ optional raw structured payload)
+1. Load `specs/main-api.openapi.json` (generated from `main-api-collection`)
+2. Extract operations via OpenAPI extract (executor-style)
+3. Register one MCP tool per `operationId`
+4. Invoke through OpenAPI HTTP executor with PAT (`x-pat`)
+5. Return text-first results (+ optional raw structured payload)
 
 ## Architecture
 
 ```txt
+specs/
+└── main-api.openapi.json   # committed; generated at build time
+
+scripts/
+├── generate-openapi.ts
+└── lib/                    # Bruno parse (build only) -> OpenAPI emitter
+
 src/
-├── api/
-│   └── client.ts          # shared HTTP client + auth + envelope/error mapping
-├── runtime/
-│   ├── bruno-parse.ts      # walk collection + parse .bru files
-│   ├── bruno-extract.ts    # parse output -> IR
-│   ├── bruno-schemas.ts    # dynamic Effect Schema builders (input only)
-│   └── bruno-registry.ts   # IR registry + executor bindings
-├── mcp/
-│   └── server.ts          # register tools from runtime registry
-├── cli.ts                 # dispatch using same registry/executor
+├── runtime/openapi/        # parse, extract, invoke, registry (from executor)
+├── mcp/server.ts
+├── cli.ts
 └── main.ts
 ```
 
@@ -112,9 +110,10 @@ File splits can be adjusted, but these boundaries should hold.
 
 ## MCP Behavior (MVP)
 
-- Tool count: one per Bruno request
-- Tool description: `docs` first line, fallback to method + path
-- Input schema: generated at runtime from params/body
+- Tool count: one per OpenAPI operation
+- Tool name: `operationId`
+- Tool description: OpenAPI `description` or `summary`, fallback to method + path
+- Input schema: from OpenAPI operation `parameters` + `requestBody`
 - Output schema: omitted for now
 - Response payload:
   - `content` text always present
@@ -167,9 +166,9 @@ File splits can be adjusted, but these boundaries should hold.
 
 ## Key Decisions
 
-1. Main API source of truth is Bruno, not OpenAPI.
-2. OpenAPI intermediary is deferred.
-3. Input schemas now; output schemas later.
-4. No name-normalization strategy in MVP.
-5. Single generic executor first; area-specific typed clients are optional later.
+1. Main API is authored in Bruno; runtime reads generated OpenAPI.
+2. Regenerate OpenAPI manually when apidocs changes (`pnpm run generate:openapi`).
+3. Input schemas from OpenAPI; output schemas later.
+4. Tool names use OpenAPI `operationId` (derived from Bruno paths at generation).
+5. Single generic OpenAPI executor; area-specific typed clients are optional later.
 6. `teamId` remains explicit in tool inputs for scoped operations.

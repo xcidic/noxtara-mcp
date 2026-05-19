@@ -23,7 +23,7 @@ This document describes the planned migration from the current bare-metal deploy
 | Docker         | Installed and enabled; no containers in use                              |
 | Deploy method  | Manual copy to server (not CI-driven)                                    |
 
-Startup loads and parses ~300 Bruno `.bru` files from `submodules/product-appsec-apidocs/main-api-collection` at process start. That drives memory use during boot.
+Startup loads `specs/main-api.openapi.json` (generated at build time from the Bruno collection). Runtime no longer parses `.bru` files.
 
 ## Goals
 
@@ -162,20 +162,20 @@ Use a built artifact (`dist/cli.mjs`), not `src/cli.ts` on the server.
 
 ### What must be in the image
 
-`bruno-parse.ts` reads the collection from disk at startup:
+The image must include the committed OpenAPI spec:
 
 ```text
-submodules/product-appsec-apidocs/main-api-collection
+specs/main-api.openapi.json
 ```
 
-The image must also include `submodules/bruno` (local `file:` dependency for `@usebruno/lang`). A dist-only image without these paths will fail at runtime.
+Regenerate this file when apidocs changes (`pnpm run generate:openapi` on a dev machine with submodules checked out). Production images do not need `submodules/product-appsec-apidocs` or `@usebruno/lang`.
 
 ### Environment variables
 
 | Variable               | Required       | Notes                                         |
 | ---------------------- | -------------- | --------------------------------------------- |
 | `NOXTARA_API_BASE_URL` | Yes            | e.g. `https://dev.appsec.xcidic.com/api/main` |
-| `NODE_OPTIONS`         | Recommended    | `--max-old-space-size=1536` on ~2 GiB VMs     |
+| `NODE_OPTIONS`         | Optional       | Default heap is usually sufficient after OpenAPI migration |
 | `NOXTARA_PAT`          | No (HTTP mode) | PAT comes from client URL `/mcp/<pat>`        |
 
 Provide secrets via Compose `env_file` on the server (not baked into the image).

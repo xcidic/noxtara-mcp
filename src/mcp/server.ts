@@ -7,7 +7,8 @@ import {
   fromJsonSchema,
 } from "@modelcontextprotocol/server"
 
-import { createBrunoRegistry } from "../runtime/bruno-registry.ts"
+import { sessionLog } from "../debug/session-log.ts"
+import { createOpenApiRegistry } from "../runtime/openapi/registry.ts"
 
 const readBody = (req: import("node:http").IncomingMessage): Promise<Uint8Array | undefined> => {
   if (req.method === "GET" || req.method === "HEAD") return Promise.resolve(undefined)
@@ -32,7 +33,7 @@ const toWebHeaders = (nodeHeaders: import("node:http").IncomingHttpHeaders): Hea
   return headers
 }
 
-const extractPatFromMcpPath = (
+export const extractPatFromMcpPath = (
   pathname: string,
 ): { pat: string } | { status: number; error: string } => {
   const parts = pathname.split("/").filter(Boolean)
@@ -45,15 +46,39 @@ const extractPatFromMcpPath = (
   return { pat: decodeURIComponent(parts[1]) }
 }
 
-export const createNoxtaraMcpServer = (options?: { baseUrl?: string; pat?: string }) => {
-  const registryOptions = options?.baseUrl ? { baseUrl: options.baseUrl } : undefined
-  const registry = createBrunoRegistry(registryOptions)
+export const createNoxtaraMcpServer = (options?: {
+  baseUrl?: string
+  pat?: string
+  forceReload?: boolean
+}) => {
+  const createStarted = performance.now()
+  // #region agent log
+  sessionLog({
+    hypothesisId: "H1",
+    location: "server.ts:createNoxtaraMcpServer",
+    message: "create started",
+    data: {
+      hasBaseUrl: Boolean(options?.baseUrl),
+      forceReload: options?.forceReload ?? Boolean(options?.baseUrl),
+    },
+  })
+  // #endregion
+
+  const registry = createOpenApiRegistry(
+    options?.baseUrl || options?.forceReload
+      ? {
+          ...(options.baseUrl ? { baseUrl: options.baseUrl } : {}),
+          forceReload: options.forceReload ?? Boolean(options.baseUrl),
+        }
+      : undefined,
+  )
 
   const server = new McpServer({
     name: "noxtara-mcp",
     version: "0.0.1",
   })
 
+  const registerStarted = performance.now()
   for (const tool of registry.tools) {
     server.registerTool(
       tool.name,
@@ -81,6 +106,19 @@ export const createNoxtaraMcpServer = (options?: { baseUrl?: string; pat?: strin
       },
     )
   }
+
+  // #region agent log
+  sessionLog({
+    hypothesisId: "H1",
+    location: "server.ts:createNoxtaraMcpServer",
+    message: "tools registered",
+    data: {
+      registerMs: Math.round(performance.now() - registerStarted),
+      totalMs: Math.round(performance.now() - createStarted),
+      toolCount: registry.tools.length,
+    },
+  })
+  // #endregion
 
   return {
     server,
@@ -120,13 +158,15 @@ const pipeWebResponseToNode = async (
   }
 }
 
-export const serveNoxtaraMcpHttp = async (options?: {
+export const startNoxtaraMcpHttpServer = async (options?: {
   baseUrl?: string
   pat?: string
   port?: number
+  host?: string
 }) => {
-  const { server: mcpServer } = createNoxtaraMcpServer(options)
-  const port = options?.port ?? 3434
+  const { server: mcpServer, registry } = createNoxtaraMcpServer(options)
+  const pat = options?.pat ?? "mcp-pat"
+  const host = options?.host ?? "127.0.0.1"
 
   const transport = new WebStandardStreamableHTTPServerTransport({
     sessionIdGenerator: () => crypto.randomUUID(),
@@ -136,7 +176,7 @@ export const serveNoxtaraMcpHttp = async (options?: {
   const httpServer = createServer(async (req, res) => {
     try {
       const body = await readBody(req)
-      const url = new URL(req.url ?? "/", `http://${req.headers.host ?? "localhost"}`)
+      const url = new URL(req.url ?? "/", `http://${req.headers.host ?? host}`)
       const pathAuth = extractPatFromMcpPath(url.pathname)
       if ("error" in pathAuth) {
         res.writeHead(pathAuth.status)
@@ -167,10 +207,46 @@ export const serveNoxtaraMcpHttp = async (options?: {
     }
   })
 
-  return new Promise<void>((resolve) => {
-    httpServer.listen(port, () => {
-      console.error(`MCP HTTP server listening on http://localhost:${port}/mcp/<pat>`)
-      resolve()
-    })
+  const port = options?.port ?? 0
+  await new Promise<void>((resolve, reject) => {
+    httpServer.once("error", reject)
+    httpServer.listen(port, host, () => resolve())
+  })
+
+  const address = httpServer.address()
+  if (!address || typeof address === "string") {
+    throw new Error("Failed to bind MCP HTTP server")
+  }
+
+  const mcpUrl = new URL(`http://${host}:${address.port}/mcp/${encodeURIComponent(pat)}`)
+
+  return {
+    mcpUrl,
+    pat,
+    registry,
+    httpServer,
+    close: async () => {
+      await transport.close()
+      await mcpServer.close()
+      await new Promise<void>((resolve, reject) => {
+        httpServer.close((error) => (error ? reject(error) : resolve()))
+      })
+    },
+  }
+}
+
+export const serveNoxtaraMcpHttp = async (options?: {
+  baseUrl?: string
+  pat?: string
+  port?: number
+}) => {
+  const { mcpUrl, close } = await startNoxtaraMcpHttpServer({
+    ...options,
+    host: "0.0.0.0",
+    port: options?.port ?? 3434,
+  })
+  console.error(`MCP HTTP server listening on ${mcpUrl.origin}/mcp/<pat>`)
+  process.on("SIGINT", () => {
+    void close()
   })
 }
