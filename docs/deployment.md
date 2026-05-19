@@ -172,11 +172,11 @@ Regenerate this file when apidocs changes (`pnpm run generate:openapi` on a dev 
 
 ### Environment variables
 
-| Variable               | Required       | Notes                                         |
-| ---------------------- | -------------- | --------------------------------------------- |
-| `NOXTARA_API_BASE_URL` | Yes            | e.g. `https://dev.appsec.xcidic.com/api/main` |
+| Variable               | Required       | Notes                                                      |
+| ---------------------- | -------------- | ---------------------------------------------------------- |
+| `NOXTARA_API_BASE_URL` | Yes            | e.g. `https://dev.appsec.xcidic.com/api/main`              |
 | `NODE_OPTIONS`         | Optional       | Default heap is usually sufficient after OpenAPI migration |
-| `NOXTARA_PAT`          | No (HTTP mode) | PAT comes from client URL `/mcp/<pat>`        |
+| `NOXTARA_PAT`          | No (HTTP mode) | PAT comes from client URL `/mcp/<pat>`                     |
 
 Provide secrets via Compose `env_file` on the server (not baked into the image).
 

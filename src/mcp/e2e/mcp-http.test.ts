@@ -1,11 +1,7 @@
 import { afterEach, describe, expect, it } from "vitest"
 
 import { extractPatFromMcpPath, startNoxtaraMcpHttpServer } from "../server.ts"
-import {
-  SAMPLE_TOOL,
-  connectMcpClient,
-  startMockApiServer,
-} from "./helpers.ts"
+import { SAMPLE_TOOL, connectMcpClient, startMockApiServer } from "./helpers.ts"
 
 describe("MCP HTTP e2e", () => {
   const servers: Array<{ close: () => Promise<void> }> = []

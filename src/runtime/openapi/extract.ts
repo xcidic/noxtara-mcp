@@ -1,4 +1,4 @@
-import { Effect, Option } from "effect";
+import { Effect, Option } from "effect"
 
 import { OpenApiExtractionError } from "./errors.ts"
 import type { ParsedDocument } from "./parse.ts"
@@ -39,9 +39,9 @@ const HTTP_METHODS: readonly HttpMethod[] = [
   "head",
   "options",
   "trace",
-];
+]
 
-const VALID_PARAM_LOCATIONS = new Set<string>(["path", "query", "header", "cookie"]);
+const VALID_PARAM_LOCATIONS = new Set<string>(["path", "query", "header", "cookie"])
 
 // ---------------------------------------------------------------------------
 // Parameter extraction
@@ -52,17 +52,17 @@ const extractParameters = (
   operation: OperationObject,
   r: DocResolver,
 ): OperationParameter[] => {
-  const merged = new Map<string, ParameterObject>();
+  const merged = new Map<string, ParameterObject>()
 
   for (const raw of pathItem.parameters ?? []) {
-    const p = r.resolve<ParameterObject>(raw);
-    if (!p) continue;
-    merged.set(`${p.in}:${p.name}`, p);
+    const p = r.resolve<ParameterObject>(raw)
+    if (!p) continue
+    merged.set(`${p.in}:${p.name}`, p)
   }
   for (const raw of operation.parameters ?? []) {
-    const p = r.resolve<ParameterObject>(raw);
-    if (!p) continue;
-    merged.set(`${p.in}:${p.name}`, p);
+    const p = r.resolve<ParameterObject>(raw)
+    if (!p) continue
+    merged.set(`${p.in}:${p.name}`, p)
   }
 
   return [...merged.values()]
@@ -78,8 +78,8 @@ const extractParameters = (
         allowReserved: Option.fromNullishOr("allowReserved" in p ? p.allowReserved : undefined),
         description: Option.fromNullishOr(p.description),
       }),
-    );
-};
+    )
+}
 
 // ---------------------------------------------------------------------------
 // Request body extraction
@@ -88,34 +88,34 @@ const extractParameters = (
 const buildEncodingRecord = (
   encoding: Record<string, unknown> | undefined,
 ): Record<string, EncodingObject> | undefined => {
-  if (!encoding) return undefined;
-  const out: Record<string, EncodingObject> = {};
+  if (!encoding) return undefined
+  const out: Record<string, EncodingObject> = {}
   for (const [prop, raw] of Object.entries(encoding)) {
-    if (typeof raw !== "object" || raw === null) continue;
+    if (typeof raw !== "object" || raw === null) continue
     const e = raw as {
-      contentType?: string;
-      style?: string;
-      explode?: boolean;
-      allowReserved?: boolean;
-    };
+      contentType?: string
+      style?: string
+      explode?: boolean
+      allowReserved?: boolean
+    }
     out[prop] = EncodingObject.make({
       contentType: Option.fromNullishOr(e.contentType),
       style: Option.fromNullishOr(e.style),
       explode: Option.fromNullishOr(e.explode),
       allowReserved: Option.fromNullishOr(e.allowReserved),
-    });
+    })
   }
-  return Object.keys(out).length > 0 ? out : undefined;
-};
+  return Object.keys(out).length > 0 ? out : undefined
+}
 
 const extractRequestBody = (
   operation: OperationObject,
   r: DocResolver,
 ): OperationRequestBody | undefined => {
-  if (!operation.requestBody) return undefined;
+  if (!operation.requestBody) return undefined
 
-  const body = r.resolve<RequestBodyObject>(operation.requestBody);
-  if (!body) return undefined;
+  const body = r.resolve<RequestBodyObject>(operation.requestBody)
+  if (!body) return undefined
 
   const contents = declaredContents(body.content).map(({ mediaType, media }) =>
     MediaBinding.make({
@@ -125,43 +125,43 @@ const extractRequestBody = (
         buildEncodingRecord((media as { encoding?: Record<string, unknown> }).encoding),
       ),
     }),
-  );
-  if (contents.length === 0) return undefined;
+  )
+  if (contents.length === 0) return undefined
 
   // Default = first declared (spec author's preferred order). Callers can
   // override at invoke time with a `contentType` arg.
-  const defaultContent = contents[0]!;
+  const defaultContent = contents[0]!
 
   return OperationRequestBody.make({
     required: body.required === true,
     contentType: defaultContent.contentType,
     schema: defaultContent.schema,
     contents: Option.some(contents),
-  });
-};
+  })
+}
 
 // ---------------------------------------------------------------------------
 // Response schema extraction
 // ---------------------------------------------------------------------------
 
 const extractOutputSchema = (operation: OperationObject, r: DocResolver): unknown | undefined => {
-  if (!operation.responses) return undefined;
+  if (!operation.responses) return undefined
 
-  const entries = Object.entries(operation.responses);
+  const entries = Object.entries(operation.responses)
   const preferred = [
     ...entries.filter(([s]) => /^2\d\d$/.test(s)).sort(([a], [b]) => a.localeCompare(b)),
     ...entries.filter(([s]) => s === "default"),
-  ];
+  ]
 
   for (const [, ref] of preferred) {
-    const resp = r.resolve<ResponseObject>(ref);
-    if (!resp) continue;
-    const content = preferredResponseContent(resp.content);
-    if (content?.media.schema) return content.media.schema;
+    const resp = r.resolve<ResponseObject>(ref)
+    if (!resp) continue
+    const content = preferredResponseContent(resp.content)
+    if (content?.media.schema) return content.media.schema
   }
 
-  return undefined;
-};
+  return undefined
+}
 
 // ---------------------------------------------------------------------------
 // Input schema builder
@@ -171,23 +171,23 @@ const buildInputSchema = (
   parameters: readonly OperationParameter[],
   requestBody: OperationRequestBody | undefined,
 ): Record<string, unknown> | undefined => {
-  const properties: Record<string, unknown> = {};
-  const required: string[] = [];
+  const properties: Record<string, unknown> = {}
+  const required: string[] = []
 
   for (const param of parameters) {
-    properties[param.name] = Option.getOrElse(param.schema, () => ({ type: "string" }));
-    if (param.required) required.push(param.name);
+    properties[param.name] = Option.getOrElse(param.schema, () => ({ type: "string" }))
+    if (param.required) required.push(param.name)
   }
 
   if (requestBody) {
-    properties.body = Option.getOrElse(requestBody.schema, () => ({ type: "object" }));
-    if (requestBody.required) required.push("body");
+    properties.body = Option.getOrElse(requestBody.schema, () => ({ type: "object" }))
+    if (requestBody.required) required.push("body")
 
     // When the spec declares multiple media types for this requestBody,
     // expose `contentType` so the model can pick. Default = first declared.
     // `body` schema tracks the default; the model is responsible for
     // supplying a body shape that matches whichever contentType it picks.
-    const contents = Option.getOrUndefined(requestBody.contents);
+    const contents = Option.getOrUndefined(requestBody.contents)
     if (contents && contents.length > 1) {
       properties.contentType = {
         type: "string",
@@ -195,19 +195,19 @@ const buildInputSchema = (
         default: requestBody.contentType,
         description:
           "Content-Type for the request body. Declared media types for this operation, in spec order.",
-      };
+      }
     }
   }
 
-  if (Object.keys(properties).length === 0) return undefined;
+  if (Object.keys(properties).length === 0) return undefined
 
   return {
     type: "object",
     properties,
     ...(required.length > 0 ? { required } : {}),
     additionalProperties: false,
-  };
-};
+  }
+}
 
 // ---------------------------------------------------------------------------
 // Operation ID derivation
@@ -220,7 +220,7 @@ const deriveOperationId = (
 ): string =>
   operation.operationId ??
   (`${method}_${pathTemplate.replace(/[^a-zA-Z0-9]+/g, "_")}`.replace(/^_+|_+$/g, "") ||
-    `${method}_operation`);
+    `${method}_operation`)
 
 // ---------------------------------------------------------------------------
 // Server extraction
@@ -228,14 +228,14 @@ const deriveOperationId = (
 
 const extractServers = (doc: ParsedDocument): ServerInfo[] =>
   (doc.servers ?? []).flatMap((server) => {
-    if (!server.url) return [];
+    if (!server.url) return []
     const vars = server.variables
       ? Object.fromEntries(
           Object.entries(server.variables).flatMap(([name, v]) => {
-            if (v.default === undefined || v.default === null) return [];
+            if (v.default === undefined || v.default === null) return []
             const enumValues = Array.isArray(v.enum)
               ? v.enum.filter((x): x is string => typeof x === "string")
-              : undefined;
+              : undefined
             return [
               [
                 name,
@@ -246,18 +246,18 @@ const extractServers = (doc: ParsedDocument): ServerInfo[] =>
                   description: Option.fromNullishOr(v.description),
                 }),
               ],
-            ];
+            ]
           }),
         )
-      : undefined;
+      : undefined
     return [
       ServerInfo.make({
         url: server.url,
         description: Option.fromNullishOr(server.description),
         variables: vars && Object.keys(vars).length > 0 ? Option.some(vars) : Option.none(),
       }),
-    ];
-  });
+    ]
+  })
 
 // ---------------------------------------------------------------------------
 // Main extraction
@@ -265,30 +265,30 @@ const extractServers = (doc: ParsedDocument): ServerInfo[] =>
 
 /** Extract all operations from a bundled OpenAPI 3.x document */
 export const extract = Effect.fn("OpenApi.extract")(function* (doc: ParsedDocument) {
-  const paths = doc.paths;
+  const paths = doc.paths
   if (!paths) {
     return yield* new OpenApiExtractionError({
       message: "OpenAPI document has no paths defined",
-    });
+    })
   }
 
-  const r = new DocResolver(doc);
-  const operations: ExtractedOperation[] = [];
+  const r = new DocResolver(doc)
+  const operations: ExtractedOperation[] = []
 
   for (const [pathTemplate, pathItem] of Object.entries(paths).sort(([a], [b]) =>
     a.localeCompare(b),
   )) {
-    if (!pathItem) continue;
+    if (!pathItem) continue
 
     for (const method of HTTP_METHODS) {
-      const operation = pathItem[method];
-      if (!operation) continue;
+      const operation = pathItem[method]
+      if (!operation) continue
 
-      const parameters = extractParameters(pathItem, operation, r);
-      const requestBody = extractRequestBody(operation, r);
-      const inputSchema = buildInputSchema(parameters, requestBody);
-      const outputSchema = extractOutputSchema(operation, r);
-      const tags = (operation.tags ?? []).filter((t) => t.trim().length > 0);
+      const parameters = extractParameters(pathItem, operation, r)
+      const requestBody = extractRequestBody(operation, r)
+      const inputSchema = buildInputSchema(parameters, requestBody)
+      const outputSchema = extractOutputSchema(operation, r)
+      const tags = (operation.tags ?? []).filter((t) => t.trim().length > 0)
 
       operations.push(
         ExtractedOperation.make({
@@ -304,7 +304,7 @@ export const extract = Effect.fn("OpenApi.extract")(function* (doc: ParsedDocume
           outputSchema: Option.fromNullishOr(outputSchema),
           deprecated: operation.deprecated === true,
         }),
-      );
+      )
     }
   }
 
@@ -313,5 +313,5 @@ export const extract = Effect.fn("OpenApi.extract")(function* (doc: ParsedDocume
     version: Option.fromNullishOr(doc.info?.version),
     servers: extractServers(doc),
     operations,
-  });
-});
+  })
+})

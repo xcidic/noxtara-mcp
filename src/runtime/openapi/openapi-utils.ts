@@ -4,8 +4,8 @@
 // Wraps the openapi-types V3/V3_1 union mess and provides clean ref resolution.
 // ---------------------------------------------------------------------------
 
-import { Option } from "effect";
-import type { OpenAPIV3, OpenAPIV3_1 } from "openapi-types";
+import { Option } from "effect"
+import type { OpenAPIV3, OpenAPIV3_1 } from "openapi-types"
 import type { ParsedDocument } from "./parse.ts"
 import type { ServerVariable } from "./types.ts"
 
@@ -15,12 +15,12 @@ import type { ServerVariable } from "./types.ts"
 
 // openapi-types V3/V3.1 unions overlap; both names are kept for readability.
 // oxlint-disable-next-line typescript/no-duplicate-type-constituents
-export type ParameterObject = OpenAPIV3.ParameterObject | OpenAPIV3_1.ParameterObject;
-export type OperationObject = OpenAPIV3.OperationObject | OpenAPIV3_1.OperationObject;
-export type PathItemObject = OpenAPIV3.PathItemObject | OpenAPIV3_1.PathItemObject;
-export type RequestBodyObject = OpenAPIV3.RequestBodyObject | OpenAPIV3_1.RequestBodyObject;
-export type ResponseObject = OpenAPIV3.ResponseObject | OpenAPIV3_1.ResponseObject;
-export type MediaTypeObject = OpenAPIV3.MediaTypeObject | OpenAPIV3_1.MediaTypeObject;
+export type ParameterObject = OpenAPIV3.ParameterObject | OpenAPIV3_1.ParameterObject
+export type OperationObject = OpenAPIV3.OperationObject | OpenAPIV3_1.OperationObject
+export type PathItemObject = OpenAPIV3.PathItemObject | OpenAPIV3_1.PathItemObject
+export type RequestBodyObject = OpenAPIV3.RequestBodyObject | OpenAPIV3_1.RequestBodyObject
+export type ResponseObject = OpenAPIV3.ResponseObject | OpenAPIV3_1.ResponseObject
+export type MediaTypeObject = OpenAPIV3.MediaTypeObject | OpenAPIV3_1.MediaTypeObject
 
 // ---------------------------------------------------------------------------
 // DocResolver — wraps a parsed document for clean $ref resolution
@@ -36,26 +36,26 @@ export class DocResolver {
   /** Resolve a value that might be a $ref, returning the resolved object */
   resolve<T>(value: T | OpenAPIV3.ReferenceObject | OpenAPIV3_1.ReferenceObject): T | null {
     if (isRef(value)) {
-      const resolved = this.resolvePointer(value.$ref);
-      return resolved as T | null;
+      const resolved = this.resolvePointer(value.$ref)
+      return resolved as T | null
     }
-    return value as T;
+    return value as T
   }
 
   private resolvePointer(ref: string): unknown {
-    if (!ref.startsWith("#/")) return null;
-    const segments = ref.slice(2).split("/");
-    let current: unknown = this.doc;
+    if (!ref.startsWith("#/")) return null
+    const segments = ref.slice(2).split("/")
+    let current: unknown = this.doc
     for (const segment of segments) {
-      if (typeof current !== "object" || current === null) return null;
-      current = (current as Record<string, unknown>)[segment];
+      if (typeof current !== "object" || current === null) return null
+      current = (current as Record<string, unknown>)[segment]
     }
-    return current;
+    return current
   }
 }
 
 const isRef = (value: unknown): value is { $ref: string } =>
-  typeof value === "object" && value !== null && "$ref" in value;
+  typeof value === "object" && value !== null && "$ref" in value
 
 // ---------------------------------------------------------------------------
 // Server URL resolution
@@ -63,57 +63,56 @@ const isRef = (value: unknown): value is { $ref: string } =>
 
 /** Substitute `{var}` placeholders in a templated URL using a plain map. */
 export const substituteUrlVariables = (url: string, values: Record<string, string>): string => {
-  let out = url;
+  let out = url
   for (const [name, value] of Object.entries(values)) {
-    out = out.replaceAll(`{${name}}`, value);
+    out = out.replaceAll(`{${name}}`, value)
   }
-  return out;
-};
+  return out
+}
 
-export const OPENAPI_MAX_SERVER_VARIABLE_OPTIONS = 64;
+export const OPENAPI_MAX_SERVER_VARIABLE_OPTIONS = 64
 
 type ServerLike = {
-  url: string;
-  variables: import("effect/Option").Option<Record<string, ServerVariable | string>>;
-};
+  url: string
+  variables: import("effect/Option").Option<Record<string, ServerVariable | string>>
+}
 
 export const expandServerUrlOptions = (
   server: ServerLike,
   limit = OPENAPI_MAX_SERVER_VARIABLE_OPTIONS,
 ): readonly string[] => {
-  if (!Option.isSome(server.variables)) return [server.url];
-  let urls: readonly string[] = [server.url];
+  if (!Option.isSome(server.variables)) return [server.url]
+  let urls: readonly string[] = [server.url]
   for (const [name, variable] of Object.entries(server.variables.value)) {
-    const enumValues =
-      typeof variable === "string" ? [] : Option.getOrElse(variable.enum, () => []);
+    const enumValues = typeof variable === "string" ? [] : Option.getOrElse(variable.enum, () => [])
     const values =
       enumValues.length > 0
         ? enumValues
-        : [typeof variable === "string" ? variable : variable.default];
-    const next: string[] = [];
+        : [typeof variable === "string" ? variable : variable.default]
+    const next: string[] = []
     for (const url of urls) {
       for (const value of values) {
-        next.push(url.replaceAll(`{${name}}`, value));
-        if (next.length >= limit) return next;
+        next.push(url.replaceAll(`{${name}}`, value))
+        if (next.length >= limit) return next
       }
     }
-    urls = next;
+    urls = next
   }
-  return urls;
-};
+  return urls
+}
 
 export const resolveBaseUrl = (servers: readonly ServerLike[]): string => {
-  const server = servers[0];
-  if (!server) return "";
+  const server = servers[0]
+  if (!server) return ""
 
-  if (!Option.isSome(server.variables)) return server.url;
+  if (!Option.isSome(server.variables)) return server.url
 
-  const values: Record<string, string> = {};
+  const values: Record<string, string> = {}
   for (const [name, v] of Object.entries(server.variables.value)) {
-    values[name] = typeof v === "string" ? v : v.default;
+    values[name] = typeof v === "string" ? v : v.default
   }
-  return substituteUrlVariables(server.url, values);
-};
+  return substituteUrlVariables(server.url, values)
+}
 
 // ---------------------------------------------------------------------------
 // Content negotiation
@@ -127,9 +126,9 @@ export const resolveBaseUrl = (servers: readonly ServerLike[]): string => {
 export const declaredContents = (
   content: Record<string, MediaTypeObject> | undefined,
 ): ReadonlyArray<{ mediaType: string; media: MediaTypeObject }> => {
-  if (!content) return [];
-  return Object.entries(content).map(([mediaType, media]) => ({ mediaType, media }));
-};
+  if (!content) return []
+  return Object.entries(content).map(([mediaType, media]) => ({ mediaType, media }))
+}
 
 /**
  * Pick the default media type for a requestBody or response. Matches
@@ -145,21 +144,21 @@ export const declaredContents = (
 export const preferredContent = (
   content: Record<string, MediaTypeObject> | undefined,
 ): { mediaType: string; media: MediaTypeObject } | undefined => {
-  const first = declaredContents(content)[0];
-  return first ? first : undefined;
-};
+  const first = declaredContents(content)[0]
+  return first ? first : undefined
+}
 
 /** Response-side content picker — still JSON-first because the server
  *  picks the response media type, so we want to advertise a preference. */
 export const preferredResponseContent = (
   content: Record<string, MediaTypeObject> | undefined,
 ): { mediaType: string; media: MediaTypeObject } | undefined => {
-  if (!content) return undefined;
-  const entries = Object.entries(content);
+  if (!content) return undefined
+  const entries = Object.entries(content)
   const pick =
     entries.find(([mt]) => mt === "application/json") ??
     entries.find(([mt]) => mt.toLowerCase().includes("+json")) ??
     entries.find(([mt]) => mt.toLowerCase().includes("json")) ??
-    entries[0];
-  return pick ? { mediaType: pick[0], media: pick[1] } : undefined;
-};
+    entries[0]
+  return pick ? { mediaType: pick[0], media: pick[1] } : undefined
+}

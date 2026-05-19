@@ -36,14 +36,14 @@ Status as of 2026-05-19. Branch: `main`.
 
 **Measured timings (local, post-fix):**
 
-| Step | ~ms |
-|------|-----|
-| OpenAPI parse + extract | 40–100 |
-| Register 226 MCP tools | 260–440 |
-| Stdio child connect | ~1.8s |
-| HTTP tool invoke | 12–26 |
-| Full e2e suite | ~7–18s |
-| `pnpm run check` | ~28s |
+| Step                    | ~ms     |
+| ----------------------- | ------- |
+| OpenAPI parse + extract | 40–100  |
+| Register 226 MCP tools  | 260–440 |
+| Stdio child connect     | ~1.8s   |
+| HTTP tool invoke        | 12–26   |
+| Full e2e suite          | ~7–18s  |
+| `pnpm run check`        | ~28s    |
 
 Root cause of perceived “timeouts” was **not a hang** — repeated stdio subprocess bootstraps (~2s each × 3 tests). Shared `beforeAll` stdio session reduced stdio file runtime from ~11s to ~6s.
 
@@ -101,12 +101,12 @@ NOXTARA_DEBUG=1 pnpm exec vitest run src/mcp/e2e
 
 ## Key paths
 
-| Path | Role |
-|------|------|
-| `specs/main-api.openapi.json` | Committed runtime spec |
-| `scripts/generate-openapi.ts` | Build entry |
-| `scripts/lib/bruno-to-openapi.ts` | Bruno → OpenAPI emitter |
-| `src/runtime/openapi/` | Runtime parse / extract / invoke / registry |
-| `src/mcp/server.ts` | MCP server + HTTP listener |
-| `src/mcp/e2e/` | MCP protocol e2e tests |
-| `src/debug/session-log.ts` | Optional debug sink |
+| Path                              | Role                                        |
+| --------------------------------- | ------------------------------------------- |
+| `specs/main-api.openapi.json`     | Committed runtime spec                      |
+| `scripts/generate-openapi.ts`     | Build entry                                 |
+| `scripts/lib/bruno-to-openapi.ts` | Bruno → OpenAPI emitter                     |
+| `src/runtime/openapi/`            | Runtime parse / extract / invoke / registry |
+| `src/mcp/server.ts`               | MCP server + HTTP listener                  |
+| `src/mcp/e2e/`                    | MCP protocol e2e tests                      |
+| `src/debug/session-log.ts`        | Optional debug sink                         |

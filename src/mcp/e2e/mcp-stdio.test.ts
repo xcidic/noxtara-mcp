@@ -1,10 +1,6 @@
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest"
 
-import {
-  SAMPLE_TOOL,
-  connectStdioClient,
-  startMockApiServer,
-} from "./helpers.ts"
+import { SAMPLE_TOOL, connectStdioClient, startMockApiServer } from "./helpers.ts"
 
 describe("MCP stdio e2e", () => {
   let sharedMockApi: Awaited<ReturnType<typeof startMockApiServer>>

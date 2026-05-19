@@ -46,9 +46,7 @@ export const brunoCollectionToOpenApi = () => {
         in: location,
         required: location === "path",
         schema: inferParamSchema(param.value),
-        ...(location === "query" && param.value !== undefined
-          ? { example: param.value }
-          : {}),
+        ...(location === "query" && param.value !== undefined ? { example: param.value } : {}),
       })
     }
 
