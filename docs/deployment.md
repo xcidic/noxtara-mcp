@@ -6,22 +6,22 @@ This document describes the planned migration from the current bare-metal deploy
 
 ## Current state (as of 2026-05-18)
 
-| Item | Value |
-|------|--------|
-| Host | UpCloud VM, Ubuntu 24.04, hostname `mcp` |
-| IP | `213.163.203.233` |
-| Local hostname | `mcp.appsec.xcidic.com` (only in `/etc/hosts` via cloud-init) |
-| Runtime | systemd unit `noxtara-mcp-dev.service` |
-| User | `noxtara` (nologin) |
-| App path | `/opt/noxtara-mcp/current/` (full repo copy, **no `.git`**) |
-| Process | `node /opt/noxtara-mcp/current/src/cli.ts mcp-http --port 23300` |
-| API backend | `NOXTARA_API_BASE_URL=https://dev.appsec.xcidic.com/api/main` |
-| Node heap | `NODE_OPTIONS=--max-old-space-size=1536` (required after OOM on startup) |
-| RAM | ~1.8 GiB (tight for heap + OS) |
-| Exposure | HTTP on **23300** publicly (ufw); no reverse proxy, no TLS |
-| Auth | PAT in URL path: `/mcp/<pat>` |
-| Docker | Installed and enabled; no containers in use |
-| Deploy method | Manual copy to server (not CI-driven) |
+| Item           | Value                                                                    |
+| -------------- | ------------------------------------------------------------------------ |
+| Host           | UpCloud VM, Ubuntu 24.04, hostname `mcp`                                 |
+| IP             | `213.163.203.233`                                                        |
+| Local hostname | `mcp.appsec.xcidic.com` (only in `/etc/hosts` via cloud-init)            |
+| Runtime        | systemd unit `noxtara-mcp-dev.service`                                   |
+| User           | `noxtara` (nologin)                                                      |
+| App path       | `/opt/noxtara-mcp/current/` (full repo copy, **no `.git`**)              |
+| Process        | `node /opt/noxtara-mcp/current/src/cli.ts mcp-http --port 23300`         |
+| API backend    | `NOXTARA_API_BASE_URL=https://dev.appsec.xcidic.com/api/main`            |
+| Node heap      | `NODE_OPTIONS=--max-old-space-size=1536` (required after OOM on startup) |
+| RAM            | ~1.8 GiB (tight for heap + OS)                                           |
+| Exposure       | HTTP on **23300** publicly (ufw); no reverse proxy, no TLS               |
+| Auth           | PAT in URL path: `/mcp/<pat>`                                            |
+| Docker         | Installed and enabled; no containers in use                              |
+| Deploy method  | Manual copy to server (not CI-driven)                                    |
 
 Startup loads and parses ~300 Bruno `.bru` files from `submodules/product-appsec-apidocs/main-api-collection` at process start. That drives memory use during boot.
 
@@ -34,13 +34,13 @@ Startup loads and parses ~300 Bruno `.bru` files from `submodules/product-appsec
 
 ## Recommended stack
 
-| Choice | Decision | Rationale |
-|--------|----------|-----------|
-| Container engine | **Docker** | Already on the VM; Compose tooling is standard. |
-| Orchestration on host | **Docker Compose** | One file for MCP + optional proxy, env files, restart policy, memory limits. |
-| Image registry | **GHCR** (TBD) | Build in CI; server only pulls. |
-| Reverse proxy | **Caddy** (optional) | Simple TLS + port 443; not required for Docker itself. |
-| Kubernetes / Swarm | **No** | Single-service VM; unnecessary complexity. |
+| Choice                | Decision             | Rationale                                                                    |
+| --------------------- | -------------------- | ---------------------------------------------------------------------------- |
+| Container engine      | **Docker**           | Already on the VM; Compose tooling is standard.                              |
+| Orchestration on host | **Docker Compose**   | One file for MCP + optional proxy, env files, restart policy, memory limits. |
+| Image registry        | **GHCR** (TBD)       | Build in CI; server only pulls.                                              |
+| Reverse proxy         | **Caddy** (optional) | Simple TLS + port 443; not required for Docker itself.                       |
+| Kubernetes / Swarm    | **No**               | Single-service VM; unnecessary complexity.                                   |
 
 Podman is a reasonable alternative org-wide, but offers no benefit on this host where Docker is already installed.
 
@@ -80,12 +80,12 @@ flowchart TB
 
 **No — not for containers.** Caddy is optional infrastructure for:
 
-| Problem | Without proxy | With Caddy (or similar) |
-|---------|---------------|-------------------------|
-| Encryption | HTTP only; PAT in URL is visible on the network | TLS on 443 |
-| Client URL | `http://IP:23300/...` | `https://hostname/...` |
-| Certificates | Manual or none | Automatic Let's Encrypt when DNS is correct |
-| Attack surface | App port on the internet | Only 443 public; app port internal |
+| Problem        | Without proxy                                   | With Caddy (or similar)                     |
+| -------------- | ----------------------------------------------- | ------------------------------------------- |
+| Encryption     | HTTP only; PAT in URL is visible on the network | TLS on 443                                  |
+| Client URL     | `http://IP:23300/...`                           | `https://hostname/...`                      |
+| Certificates   | Manual or none                                  | Automatic Let's Encrypt when DNS is correct |
+| Attack surface | App port on the internet                        | Only 443 public; app port internal          |
 
 The application does not implement TLS today. For a host reachable from the public internet with PAT-in-URL auth, **some TLS termination is strongly recommended**.
 
@@ -112,8 +112,8 @@ That name works **only on the VM**. It does not help laptops, MCP clients, or Le
 
 In the DNS provider for the `appsec.xcidic.com` zone (or parent zone), create:
 
-| Type | Name | Value | Notes |
-|------|------|--------|--------|
+| Type  | Name  | Value             | Notes                                                         |
+| ----- | ----- | ----------------- | ------------------------------------------------------------- |
 | **A** | `mcp` | `213.163.203.233` | If zone is `appsec.xcidic.com` → FQDN `mcp.appsec.xcidic.com` |
 
 Adjust the record name if the managed zone is `xcidic.com` (e.g. name `mcp.appsec`).
@@ -126,12 +126,12 @@ mcp.appsec.xcidic.com  →  213.163.203.233
 
 ### Why DNS matters
 
-| Use case | Needs public DNS? |
-|----------|-------------------|
-| Docker / Compose internal service names (`mcp`, `caddy`) | No |
-| Clients connecting by IP `:23300` | No |
-| Clients using `https://mcp.appsec.xcidic.com` | **Yes** |
-| Let's Encrypt HTTP-01 (Caddy default) | **Yes** — CA must resolve the name to this server |
+| Use case                                                 | Needs public DNS?                                 |
+| -------------------------------------------------------- | ------------------------------------------------- |
+| Docker / Compose internal service names (`mcp`, `caddy`) | No                                                |
+| Clients connecting by IP `:23300`                        | No                                                |
+| Clients using `https://mcp.appsec.xcidic.com`            | **Yes**                                           |
+| Let's Encrypt HTTP-01 (Caddy default)                    | **Yes** — CA must resolve the name to this server |
 
 DNS is **not** required for the container migration itself; it is required for a **stable hostname** and **automated HTTPS** on that hostname.
 
@@ -172,11 +172,11 @@ The image must also include `submodules/bruno` (local `file:` dependency for `@u
 
 ### Environment variables
 
-| Variable | Required | Notes |
-|----------|----------|--------|
-| `NOXTARA_API_BASE_URL` | Yes | e.g. `https://dev.appsec.xcidic.com/api/main` |
-| `NODE_OPTIONS` | Recommended | `--max-old-space-size=1536` on ~2 GiB VMs |
-| `NOXTARA_PAT` | No (HTTP mode) | PAT comes from client URL `/mcp/<pat>` |
+| Variable               | Required       | Notes                                         |
+| ---------------------- | -------------- | --------------------------------------------- |
+| `NOXTARA_API_BASE_URL` | Yes            | e.g. `https://dev.appsec.xcidic.com/api/main` |
+| `NODE_OPTIONS`         | Recommended    | `--max-old-space-size=1536` on ~2 GiB VMs     |
+| `NOXTARA_PAT`          | No (HTTP mode) | PAT comes from client URL `/mcp/<pat>`        |
 
 Provide secrets via Compose `env_file` on the server (not baked into the image).
 
@@ -188,23 +188,23 @@ Provide secrets via Compose `env_file` on the server (not baked into the image).
 
 ## Repository artifacts (to implement later)
 
-| Path | Purpose |
-|------|---------|
-| `Dockerfile` | Multi-stage build with submodules |
-| `.dockerignore` | Exclude `.git`, tests, `.references/`, etc. |
-| `deploy/compose.yml` | MCP service + optional Caddy |
-| `deploy/Caddyfile` | TLS + reverse proxy to `mcp:23300` |
-| `deploy/.env.example` | Document server-side env vars |
-| `.github/workflows/` (extend) | Build, push image on tag or `main` |
+| Path                          | Purpose                                     |
+| ----------------------------- | ------------------------------------------- |
+| `Dockerfile`                  | Multi-stage build with submodules           |
+| `.dockerignore`               | Exclude `.git`, tests, `.references/`, etc. |
+| `deploy/compose.yml`          | MCP service + optional Caddy                |
+| `deploy/Caddyfile`            | TLS + reverse proxy to `mcp:23300`          |
+| `deploy/.env.example`         | Document server-side env vars               |
+| `.github/workflows/` (extend) | Build, push image on tag or `main`          |
 
 Server deploy directory (on VM, not necessarily in git): e.g. `/opt/noxtara-mcp/deploy/` with `compose.yml`, `Caddyfile`, and `.env`.
 
 ## CI/CD model
 
-| Where | Responsibility |
-|-------|----------------|
-| **CI** | Submodule init, install, build, `docker build`, push to registry (pin tags, avoid `latest` in prod) |
-| **Server** | `docker compose pull && docker compose up -d` only |
+| Where      | Responsibility                                                                                      |
+| ---------- | --------------------------------------------------------------------------------------------------- |
+| **CI**     | Submodule init, install, build, `docker build`, push to registry (pin tags, avoid `latest` in prod) |
+| **Server** | `docker compose pull && docker compose up -d` only                                                  |
 
 No `pnpm install` or git checkout on the server after migration.
 
