@@ -168,9 +168,8 @@ export const startNoxtaraMcpHttpServer = async (options?: {
   const pat = options?.pat ?? "mcp-pat"
   const host = options?.host ?? "127.0.0.1"
 
-  const transport = new WebStandardStreamableHTTPServerTransport({
-    sessionIdGenerator: () => crypto.randomUUID(),
-  })
+  // Stateless: no sessionIdGenerator — multiple clients can initialize on one transport.
+  const transport = new WebStandardStreamableHTTPServerTransport()
   await mcpServer.connect(transport)
 
   const httpServer = createServer(async (req, res) => {

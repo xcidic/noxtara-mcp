@@ -31,6 +31,41 @@ describe("MCP HTTP e2e", () => {
     expect(await response.text()).toContain("Missing PAT")
   })
 
+  it("allows multiple clients to initialize against the same server", async () => {
+    const mockApi = await startMockApiServer()
+    servers.push(mockApi)
+
+    const mcp = await startNoxtaraMcpHttpServer({ baseUrl: mockApi.baseUrl })
+    servers.push(mcp)
+
+    const base = new URL(mcp.mcpUrl)
+    const patA = new URL(base)
+    patA.pathname = `/mcp/${encodeURIComponent("pat-a")}`
+    const patB = new URL(base)
+    patB.pathname = `/mcp/${encodeURIComponent("pat-b")}`
+
+    const clientA = await connectMcpClient(patA)
+    const clientB = await connectMcpClient(patB)
+    servers.push({
+      close: async () => {
+        await clientA.transport.close()
+        await clientA.client.close()
+        await clientB.transport.close()
+        await clientB.client.close()
+      },
+    })
+
+    const [toolsA, toolsB] = await Promise.all([
+      clientA.client.listTools(),
+      clientB.client.listTools(),
+    ])
+
+    expect(toolsA.tools.length).toBeGreaterThan(100)
+    expect(toolsB.tools.length).toBe(toolsA.tools.length)
+    expect(clientA.client.getServerVersion()?.name).toBe("noxtara-mcp")
+    expect(clientB.client.getServerVersion()?.name).toBe("noxtara-mcp")
+  })
+
   it("initializes and lists OpenAPI-derived tools", async () => {
     const mockApi = await startMockApiServer()
     servers.push(mockApi)
