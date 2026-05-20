@@ -16,9 +16,7 @@
       "post": {
         "operationId": "account_2fa_create_channel",
         "summary": "2FA - Create channel",
-        "tags": [
-          "Account"
-        ],
+        "tags": ["Account"],
         "parameters": [],
         "requestBody": {
           "required": false,
@@ -37,9 +35,7 @@
       "get": {
         "operationId": "account_2fa_get_all_channels",
         "summary": "2FA - Get all channels",
-        "tags": [
-          "Account"
-        ],
+        "tags": ["Account"],
         "parameters": [],
         "responses": {
           "default": {
@@ -52,9 +48,7 @@
       "delete": {
         "operationId": "account_2fa_delete_a_channel",
         "summary": "2FA - Delete a channel",
-        "tags": [
-          "Account"
-        ],
+        "tags": ["Account"],
         "parameters": [
           {
             "name": "channelId",
@@ -76,9 +70,7 @@
       "post": {
         "operationId": "account_2fa_enable_disable_channel",
         "summary": "2FA - Enable/disable channel",
-        "tags": [
-          "Account"
-        ],
+        "tags": ["Account"],
         "parameters": [
           {
             "name": "channelId",
@@ -108,9 +100,7 @@
       "post": {
         "operationId": "account_2fa_regenerate_token_for_channel_validation",
         "summary": "2FA - Regenerate token for channel validation",
-        "tags": [
-          "Account"
-        ],
+        "tags": ["Account"],
         "parameters": [],
         "requestBody": {
           "required": false,
@@ -139,9 +129,7 @@
       "post": {
         "operationId": "account_2fa_verify_created_channel",
         "summary": "2FA - Verify created channel",
-        "tags": [
-          "Account"
-        ],
+        "tags": ["Account"],
         "parameters": [],
         "requestBody": {
           "required": false,
@@ -162,9 +150,7 @@
       "get": {
         "operationId": "account_get_my_account",
         "summary": "Get My Account",
-        "tags": [
-          "Account"
-        ],
+        "tags": ["Account"],
         "parameters": [],
         "responses": {
           "default": {
@@ -175,9 +161,7 @@
       "patch": {
         "operationId": "account_update_my_account",
         "summary": "Update My Account",
-        "tags": [
-          "Account"
-        ],
+        "tags": ["Account"],
         "parameters": [],
         "requestBody": {
           "required": false,
@@ -198,9 +182,7 @@
       "patch": {
         "operationId": "account_update_my_password",
         "summary": "Update My Password",
-        "tags": [
-          "Account"
-        ],
+        "tags": ["Account"],
         "parameters": [],
         "requestBody": {
           "required": false,
@@ -221,9 +203,7 @@
       "post": {
         "operationId": "account_public_2fa_login_with_token",
         "summary": "2FA - Login with token",
-        "tags": [
-          "Account (Public)"
-        ],
+        "tags": ["Account (Public)"],
         "parameters": [],
         "requestBody": {
           "required": false,
@@ -255,9 +235,7 @@
       "post": {
         "operationId": "account_public_2fa_resend_otp",
         "summary": "2FA - Resend OTP",
-        "tags": [
-          "Account (Public)"
-        ],
+        "tags": ["Account (Public)"],
         "parameters": [],
         "requestBody": {
           "required": false,
@@ -286,9 +264,7 @@
       "post": {
         "operationId": "account_public_login_with_email",
         "summary": "Login with Email",
-        "tags": [
-          "Account (Public)"
-        ],
+        "tags": ["Account (Public)"],
         "parameters": [],
         "requestBody": {
           "required": false,
@@ -309,9 +285,7 @@
       "get": {
         "operationId": "account_public_login_with_oauth_provider",
         "summary": "Login with OAuth Provider",
-        "tags": [
-          "Account (Public)"
-        ],
+        "tags": ["Account (Public)"],
         "parameters": [
           {
             "name": "provider",
@@ -333,9 +307,7 @@
       "post": {
         "operationId": "account_public_register_with_email",
         "summary": "Register with Email",
-        "tags": [
-          "Account (Public)"
-        ],
+        "tags": ["Account (Public)"],
         "parameters": [],
         "requestBody": {
           "required": false,
@@ -356,9 +328,7 @@
       "post": {
         "operationId": "account_public_request_password_reset",
         "summary": "Request password reset",
-        "tags": [
-          "Account (Public)"
-        ],
+        "tags": ["Account (Public)"],
         "parameters": [],
         "requestBody": {
           "required": false,
@@ -379,9 +349,7 @@
       "post": {
         "operationId": "account_public_resend_verification_email",
         "summary": "Resend Verification Email",
-        "tags": [
-          "Account (Public)"
-        ],
+        "tags": ["Account (Public)"],
         "parameters": [],
         "requestBody": {
           "required": false,
@@ -410,9 +378,7 @@
       "post": {
         "operationId": "account_public_reset_password",
         "summary": "Reset password",
-        "tags": [
-          "Account (Public)"
-        ],
+        "tags": ["Account (Public)"],
         "parameters": [],
         "requestBody": {
           "required": false,
@@ -447,9 +413,7 @@
       "get": {
         "operationId": "account_public_test_logging",
         "summary": "Test Logging",
-        "tags": [
-          "Account (Public)"
-        ],
+        "tags": ["Account (Public)"],
         "parameters": [],
         "responses": {
           "default": {
@@ -462,9 +426,7 @@
       "post": {
         "operationId": "account_public_verify_email",
         "summary": "Verify Email",
-        "tags": [
-          "Account (Public)"
-        ],
+        "tags": ["Account (Public)"],
         "parameters": [],
         "requestBody": {
           "required": false,
@@ -493,9 +455,7 @@
       "get": {
         "operationId": "admin_new_access_log_get_access_log",
         "summary": "Get Access Log",
-        "tags": [
-          "Admin"
-        ],
+        "tags": ["Admin"],
         "parameters": [
           {
             "name": "sort",
@@ -554,9 +514,7 @@
       "get": {
         "operationId": "admin_new_feature_analytics_get_feature_usage",
         "summary": "Get Feature Usage",
-        "tags": [
-          "Admin"
-        ],
+        "tags": ["Admin"],
         "parameters": [
           {
             "name": "sort",
@@ -624,9 +582,7 @@
       "get": {
         "operationId": "admin_new_feature_analytics_usage_summary",
         "summary": "Usage summary",
-        "tags": [
-          "Admin"
-        ],
+        "tags": ["Admin"],
         "parameters": [
           {
             "name": "startDate",
@@ -658,9 +614,7 @@
       "post": {
         "operationId": "admin_new_subscription_subscription_trigger_status_checking",
         "summary": "Subscription - Trigger status checking",
-        "tags": [
-          "Admin"
-        ],
+        "tags": ["Admin"],
         "parameters": [
           {
             "name": "type",
@@ -690,9 +644,7 @@
       "get": {
         "operationId": "admin_account_updated_get_admin_profile",
         "summary": "[Updated] Get Admin Profile",
-        "tags": [
-          "Admin"
-        ],
+        "tags": ["Admin"],
         "parameters": [],
         "requestBody": {
           "required": false,
@@ -713,9 +665,7 @@
       "post": {
         "operationId": "admin_account_login",
         "summary": "Login",
-        "tags": [
-          "Admin"
-        ],
+        "tags": ["Admin"],
         "parameters": [],
         "requestBody": {
           "required": false,
@@ -736,9 +686,7 @@
       "get": {
         "operationId": "admin_admin_roles_role_get_all_roles",
         "summary": "Role - Get all roles",
-        "tags": [
-          "Admin"
-        ],
+        "tags": ["Admin"],
         "parameters": [],
         "responses": {
           "default": {
@@ -751,9 +699,7 @@
       "post": {
         "operationId": "admin_admin_users_admin_create_one",
         "summary": "Admin - Create one",
-        "tags": [
-          "Admin"
-        ],
+        "tags": ["Admin"],
         "parameters": [],
         "requestBody": {
           "required": false,
@@ -772,9 +718,7 @@
       "get": {
         "operationId": "admin_admin_users_admin_get_many",
         "summary": "Admin - Get many",
-        "tags": [
-          "Admin"
-        ],
+        "tags": ["Admin"],
         "parameters": [
           {
             "name": "withNext",
@@ -815,9 +759,7 @@
       "delete": {
         "operationId": "admin_admin_users_admin_delete_one",
         "summary": "Admin - Delete one",
-        "tags": [
-          "Admin"
-        ],
+        "tags": ["Admin"],
         "parameters": [
           {
             "name": "id",
@@ -837,9 +779,7 @@
       "patch": {
         "operationId": "admin_admin_users_admin_update_one",
         "summary": "Admin - Update one",
-        "tags": [
-          "Admin"
-        ],
+        "tags": ["Admin"],
         "parameters": [
           {
             "name": "id",
@@ -869,9 +809,7 @@
       "get": {
         "operationId": "admin_check_access",
         "summary": "Check Access",
-        "tags": [
-          "Admin"
-        ],
+        "tags": ["Admin"],
         "parameters": [],
         "responses": {
           "default": {
@@ -884,9 +822,7 @@
       "get": {
         "operationId": "admin_risk_summary",
         "summary": "Risk Summary",
-        "tags": [
-          "Admin"
-        ],
+        "tags": ["Admin"],
         "parameters": [],
         "responses": {
           "default": {
@@ -899,9 +835,7 @@
       "post": {
         "operationId": "admin_team_type_type_create_one",
         "summary": "Type - Create one",
-        "tags": [
-          "Admin"
-        ],
+        "tags": ["Admin"],
         "parameters": [],
         "requestBody": {
           "required": false,
@@ -937,9 +871,7 @@
       "get": {
         "operationId": "admin_team_type_type_get_many",
         "summary": "Type - Get many",
-        "tags": [
-          "Admin"
-        ],
+        "tags": ["Admin"],
         "parameters": [],
         "responses": {
           "default": {
@@ -952,9 +884,7 @@
       "delete": {
         "operationId": "admin_team_type_type_delete_one",
         "summary": "Type - Delete one",
-        "tags": [
-          "Admin"
-        ],
+        "tags": ["Admin"],
         "parameters": [
           {
             "name": "typeId",
@@ -974,9 +904,7 @@
       "get": {
         "operationId": "admin_team_type_type_get_one",
         "summary": "Type - Get one",
-        "tags": [
-          "Admin"
-        ],
+        "tags": ["Admin"],
         "parameters": [
           {
             "name": "typeId",
@@ -996,9 +924,7 @@
       "patch": {
         "operationId": "admin_team_type_type_update_one",
         "summary": "Type - Update one",
-        "tags": [
-          "Admin"
-        ],
+        "tags": ["Admin"],
         "parameters": [
           {
             "name": "typeId",
@@ -1045,9 +971,7 @@
       "post": {
         "operationId": "admin_teams_domain_add_some_domains",
         "summary": "Domain - Add some domains",
-        "tags": [
-          "Admin"
-        ],
+        "tags": ["Admin"],
         "parameters": [
           {
             "name": "teamId",
@@ -1077,9 +1001,7 @@
       "delete": {
         "operationId": "admin_teams_domain_delete_a_domain",
         "summary": "Domain - Delete a domain",
-        "tags": [
-          "Admin"
-        ],
+        "tags": ["Admin"],
         "parameters": [
           {
             "name": "teamId",
@@ -1109,9 +1031,7 @@
       "get": {
         "operationId": "admin_teams_domain_get_all_domains",
         "summary": "Domain - Get all domains",
-        "tags": [
-          "Admin"
-        ],
+        "tags": ["Admin"],
         "parameters": [
           {
             "name": "teamId",
@@ -1133,9 +1053,7 @@
       "post": {
         "operationId": "admin_teams_member_add_some_members",
         "summary": "Member - Add some members",
-        "tags": [
-          "Admin"
-        ],
+        "tags": ["Admin"],
         "parameters": [
           {
             "name": "teamId",
@@ -1165,9 +1083,7 @@
       "delete": {
         "operationId": "admin_teams_member_delete_one_member",
         "summary": "Member - Delete one member",
-        "tags": [
-          "Admin"
-        ],
+        "tags": ["Admin"],
         "parameters": [
           {
             "name": "teamId",
@@ -1197,9 +1113,7 @@
       "get": {
         "operationId": "admin_teams_member_get_all_team_members",
         "summary": "Member - Get all team members",
-        "tags": [
-          "Admin"
-        ],
+        "tags": ["Admin"],
         "parameters": [
           {
             "name": "teamId",
@@ -1221,9 +1135,7 @@
       "get": {
         "operationId": "admin_teams_subscription_get_one_team",
         "summary": "Subscription - Get one team",
-        "tags": [
-          "Admin"
-        ],
+        "tags": ["Admin"],
         "parameters": [
           {
             "name": "teamId",
@@ -1243,9 +1155,7 @@
       "patch": {
         "operationId": "admin_teams_subscription_update_one_team",
         "summary": "Subscription - Update one team",
-        "tags": [
-          "Admin"
-        ],
+        "tags": ["Admin"],
         "parameters": [
           {
             "name": "teamId",
@@ -1275,9 +1185,7 @@
       "post": {
         "operationId": "admin_teams_teams_create_one",
         "summary": "Teams - Create one",
-        "tags": [
-          "Admin"
-        ],
+        "tags": ["Admin"],
         "parameters": [],
         "requestBody": {
           "required": false,
@@ -1296,9 +1204,7 @@
       "get": {
         "operationId": "admin_teams_teams_get_many",
         "summary": "Teams - Get many",
-        "tags": [
-          "Admin"
-        ],
+        "tags": ["Admin"],
         "parameters": [
           {
             "name": "search",
@@ -1321,9 +1227,7 @@
       "get": {
         "operationId": "admin_teams_teams_get_one",
         "summary": "Teams - Get one",
-        "tags": [
-          "Admin"
-        ],
+        "tags": ["Admin"],
         "parameters": [
           {
             "name": "id",
@@ -1345,9 +1249,7 @@
       "patch": {
         "operationId": "admin_teams_teams_update_one",
         "summary": "Teams - Update one",
-        "tags": [
-          "Admin"
-        ],
+        "tags": ["Admin"],
         "parameters": [
           {
             "name": "teamId",
@@ -1377,9 +1279,7 @@
       "post": {
         "operationId": "admin_user_type_type_create_one",
         "summary": "Type - Create one",
-        "tags": [
-          "Admin"
-        ],
+        "tags": ["Admin"],
         "parameters": [],
         "requestBody": {
           "required": false,
@@ -1424,9 +1324,7 @@
       "get": {
         "operationId": "admin_user_type_type_get_many",
         "summary": "Type - Get many",
-        "tags": [
-          "Admin"
-        ],
+        "tags": ["Admin"],
         "parameters": [],
         "responses": {
           "default": {
@@ -1439,9 +1337,7 @@
       "delete": {
         "operationId": "admin_user_type_type_delete_one",
         "summary": "Type - Delete one",
-        "tags": [
-          "Admin"
-        ],
+        "tags": ["Admin"],
         "parameters": [
           {
             "name": "typeId",
@@ -1461,9 +1357,7 @@
       "get": {
         "operationId": "admin_user_type_type_get_one",
         "summary": "Type - Get one",
-        "tags": [
-          "Admin"
-        ],
+        "tags": ["Admin"],
         "parameters": [
           {
             "name": "typeId",
@@ -1483,9 +1377,7 @@
       "patch": {
         "operationId": "admin_user_type_type_update_one",
         "summary": "Type - Update one",
-        "tags": [
-          "Admin"
-        ],
+        "tags": ["Admin"],
         "parameters": [
           {
             "name": "typeId",
@@ -1541,9 +1433,7 @@
       "post": {
         "operationId": "admin_users_users_create_one",
         "summary": "Users - Create one",
-        "tags": [
-          "Admin"
-        ],
+        "tags": ["Admin"],
         "parameters": [],
         "requestBody": {
           "required": false,
@@ -1562,9 +1452,7 @@
       "get": {
         "operationId": "admin_users_users_get_many",
         "summary": "Users - Get many",
-        "tags": [
-          "Admin"
-        ],
+        "tags": ["Admin"],
         "parameters": [
           {
             "name": "search",
@@ -1587,9 +1475,7 @@
       "delete": {
         "operationId": "admin_users_users_delete_one",
         "summary": "Users - Delete one",
-        "tags": [
-          "Admin"
-        ],
+        "tags": ["Admin"],
         "parameters": [
           {
             "name": "id",
@@ -1609,9 +1495,7 @@
       "get": {
         "operationId": "admin_users_users_get_one",
         "summary": "Users - Get one",
-        "tags": [
-          "Admin"
-        ],
+        "tags": ["Admin"],
         "parameters": [
           {
             "name": "id",
@@ -1631,9 +1515,7 @@
       "patch": {
         "operationId": "admin_users_users_update_one",
         "summary": "Users - Update one",
-        "tags": [
-          "Admin"
-        ],
+        "tags": ["Admin"],
         "parameters": [
           {
             "name": "id",
@@ -1663,9 +1545,7 @@
       "get": {
         "operationId": "alerts_alerts_get_one",
         "summary": "!!! Alerts - Get One",
-        "tags": [
-          "Alerts"
-        ],
+        "tags": ["Alerts"],
         "parameters": [
           {
             "name": "teamId",
@@ -1693,9 +1573,7 @@
       "patch": {
         "operationId": "alerts_alerts_update_one",
         "summary": "Alerts - Update One",
-        "tags": [
-          "Alerts"
-        ],
+        "tags": ["Alerts"],
         "parameters": [
           {
             "name": "teamId",
@@ -1733,9 +1611,7 @@
       "get": {
         "operationId": "alerts_alerts_get_all",
         "summary": "Alerts - Get All",
-        "tags": [
-          "Alerts"
-        ],
+        "tags": ["Alerts"],
         "parameters": [
           {
             "name": "sorts[]",
@@ -1784,9 +1660,7 @@
       "patch": {
         "operationId": "alerts_alerts_update_one_by_vulnerability",
         "summary": "Alerts - Update One By Vulnerability",
-        "tags": [
-          "Alerts"
-        ],
+        "tags": ["Alerts"],
         "parameters": [
           {
             "name": "teamId",
@@ -1816,9 +1690,7 @@
       "post": {
         "operationId": "api_manager_key_create_one_key",
         "summary": "Key - Create one key",
-        "tags": [
-          "API Manager"
-        ],
+        "tags": ["API Manager"],
         "parameters": [
           {
             "name": "teamId",
@@ -1896,9 +1768,7 @@
       "get": {
         "operationId": "api_manager_key_get_many_keys",
         "summary": "Key - Get many keys",
-        "tags": [
-          "API Manager"
-        ],
+        "tags": ["API Manager"],
         "parameters": [
           {
             "name": "teamId",
@@ -1920,9 +1790,7 @@
       "delete": {
         "operationId": "api_manager_key_delete_one_key",
         "summary": "Key - Delete one key",
-        "tags": [
-          "API Manager"
-        ],
+        "tags": ["API Manager"],
         "parameters": [
           {
             "name": "teamId",
@@ -1950,9 +1818,7 @@
       "get": {
         "operationId": "api_manager_key_get_one_key_detail",
         "summary": "Key - Get one key detail",
-        "tags": [
-          "API Manager"
-        ],
+        "tags": ["API Manager"],
         "parameters": [
           {
             "name": "teamId",
@@ -1980,9 +1846,7 @@
       "patch": {
         "operationId": "api_manager_key_update_one_key",
         "summary": "Key - Update one key",
-        "tags": [
-          "API Manager"
-        ],
+        "tags": ["API Manager"],
         "parameters": [
           {
             "name": "teamId",
@@ -2064,9 +1928,7 @@
       "put": {
         "operationId": "api_manager_key_disable_enable_one_key",
         "summary": "Key - Disable/enable one key",
-        "tags": [
-          "API Manager"
-        ],
+        "tags": ["API Manager"],
         "parameters": [
           {
             "name": "status",
@@ -2104,9 +1966,7 @@
       "post": {
         "operationId": "api_manager_key_regenerate_one_key",
         "summary": "Key - Regenerate one key",
-        "tags": [
-          "API Manager"
-        ],
+        "tags": ["API Manager"],
         "parameters": [
           {
             "name": "teamId",
@@ -2136,9 +1996,7 @@
       "post": {
         "operationId": "api_manager_key_verify_key",
         "summary": "Key - Verify key",
-        "tags": [
-          "API Manager"
-        ],
+        "tags": ["API Manager"],
         "parameters": [
           {
             "name": "teamId",
@@ -2176,9 +2034,7 @@
       "get": {
         "operationId": "api_manager_permissions_get_all_available_permissions",
         "summary": "Permissions - Get all available permissions",
-        "tags": [
-          "API Manager"
-        ],
+        "tags": ["API Manager"],
         "parameters": [
           {
             "name": "teamId",
@@ -2200,9 +2056,7 @@
       "get": {
         "operationId": "api_manager_sample_protected_api_endpoints_sample_api_r_68197d30",
         "summary": "Sample API - Require key with specific permission (vpn)",
-        "tags": [
-          "API Manager"
-        ],
+        "tags": ["API Manager"],
         "parameters": [],
         "responses": {
           "default": {
@@ -2215,9 +2069,7 @@
       "get": {
         "operationId": "api_manager_sample_protected_api_endpoints_sample_api_r_0497acdd",
         "summary": "Sample API - Require key witthout specific permission",
-        "tags": [
-          "API Manager"
-        ],
+        "tags": ["API Manager"],
         "parameters": [],
         "responses": {
           "default": {
@@ -2230,9 +2082,7 @@
       "get": {
         "operationId": "asm_asset_get_assets_per_type",
         "summary": "Asset - Get assets per type",
-        "tags": [
-          "ASM"
-        ],
+        "tags": ["ASM"],
         "parameters": [
           {
             "name": "offset",
@@ -2324,9 +2174,7 @@
       "get": {
         "operationId": "asm_asset_get_detail_node",
         "summary": "Asset - Get detail node",
-        "tags": [
-          "ASM"
-        ],
+        "tags": ["ASM"],
         "parameters": [
           {
             "name": "teamId",
@@ -2356,9 +2204,7 @@
       "get": {
         "operationId": "asm_asset_get_detail",
         "summary": "Asset - Get detail",
-        "tags": [
-          "ASM"
-        ],
+        "tags": ["ASM"],
         "parameters": [
           {
             "name": "teamId",
@@ -2396,9 +2242,7 @@
       "get": {
         "operationId": "asm_asset_scan_get_many_findings",
         "summary": "Asset Scan - Get many findings",
-        "tags": [
-          "ASM"
-        ],
+        "tags": ["ASM"],
         "parameters": [
           {
             "name": "teamId",
@@ -2428,9 +2272,7 @@
       "post": {
         "operationId": "asm_asset_scan_trigger_when_not_exists_failed_or_completed",
         "summary": "Asset Scan - Trigger (when not exists, failed, or, completed)",
-        "tags": [
-          "ASM"
-        ],
+        "tags": ["ASM"],
         "parameters": [
           {
             "name": "teamId",
@@ -2468,9 +2310,7 @@
       "post": {
         "operationId": "asm_asset_scan_trigger_dast",
         "summary": "Asset Scan - Trigger Dast",
-        "tags": [
-          "ASM"
-        ],
+        "tags": ["ASM"],
         "parameters": [
           {
             "name": "teamId",
@@ -2524,9 +2364,7 @@
       "post": {
         "operationId": "asm_entry_create_one",
         "summary": "Entry - Create one",
-        "tags": [
-          "ASM"
-        ],
+        "tags": ["ASM"],
         "parameters": [
           {
             "name": "teamId",
@@ -2568,9 +2406,7 @@
       "get": {
         "operationId": "asm_entry_get_many_entries",
         "summary": "Entry - Get many entries",
-        "tags": [
-          "ASM"
-        ],
+        "tags": ["ASM"],
         "parameters": [
           {
             "name": "offset",
@@ -2628,9 +2464,7 @@
       "delete": {
         "operationId": "asm_entry_delete_one",
         "summary": "Entry - Delete one",
-        "tags": [
-          "ASM"
-        ],
+        "tags": ["ASM"],
         "parameters": [
           {
             "name": "teamId",
@@ -2658,9 +2492,7 @@
       "get": {
         "operationId": "asm_entry_get_one_entry_detail",
         "summary": "Entry - Get one entry detail",
-        "tags": [
-          "ASM"
-        ],
+        "tags": ["ASM"],
         "parameters": [
           {
             "name": "teamId",
@@ -2690,9 +2522,7 @@
       "post": {
         "operationId": "asm_entry_reload_scan_status",
         "summary": "Entry - Reload scan status",
-        "tags": [
-          "ASM"
-        ],
+        "tags": ["ASM"],
         "parameters": [
           {
             "name": "teamId",
@@ -2722,9 +2552,7 @@
       "post": {
         "operationId": "asm_entry_trigger_re_scan",
         "summary": "Entry - Trigger Re-scan",
-        "tags": [
-          "ASM"
-        ],
+        "tags": ["ASM"],
         "parameters": [
           {
             "name": "teamId",
@@ -2754,9 +2582,7 @@
       "get": {
         "operationId": "asm_vulnerability_get_list_of_vulnerabilities",
         "summary": "!!! Get List of Vulnerabilities",
-        "tags": [
-          "ASM Vulnerability"
-        ],
+        "tags": ["ASM Vulnerability"],
         "parameters": [
           {
             "name": "sort",
@@ -2831,9 +2657,7 @@
       "get": {
         "operationId": "asm_vulnerability_get_detail_of_a_vulnerability",
         "summary": "Get Detail of a Vulnerability",
-        "tags": [
-          "ASM Vulnerability"
-        ],
+        "tags": ["ASM Vulnerability"],
         "parameters": [
           {
             "name": "teamId",
@@ -2871,9 +2695,7 @@
       "get": {
         "operationId": "asset_discovery_get_details_of_an_entity",
         "summary": "Get details of an entity",
-        "tags": [
-          "Asset Discovery"
-        ],
+        "tags": ["Asset Discovery"],
         "parameters": [
           {
             "name": "idOrEntityId",
@@ -2911,9 +2733,7 @@
       "get": {
         "operationId": "asset_discovery_get_details_of_scan_entry",
         "summary": "Get details of scan entry",
-        "tags": [
-          "Asset Discovery"
-        ],
+        "tags": ["Asset Discovery"],
         "parameters": [
           {
             "name": "discoveryId",
@@ -2943,9 +2763,7 @@
       "get": {
         "operationId": "asset_discovery_list_all_entities_edges",
         "summary": "List all entities & edges",
-        "tags": [
-          "Asset Discovery"
-        ],
+        "tags": ["Asset Discovery"],
         "parameters": [
           {
             "name": "teamId",
@@ -2975,9 +2793,7 @@
       "get": {
         "operationId": "asset_discovery_list_all_entities",
         "summary": "List all entities",
-        "tags": [
-          "Asset Discovery"
-        ],
+        "tags": ["Asset Discovery"],
         "parameters": [
           {
             "name": "teamId",
@@ -3007,9 +2823,7 @@
       "get": {
         "operationId": "asset_discovery_list_all_scan_entries",
         "summary": "List all scan entries",
-        "tags": [
-          "Asset Discovery"
-        ],
+        "tags": ["Asset Discovery"],
         "parameters": [
           {
             "name": "sort",
@@ -3067,9 +2881,7 @@
       "get": {
         "operationId": "asset_discovery_list_all_valid_domains_of_a_team",
         "summary": "List all valid domains of a team",
-        "tags": [
-          "Asset Discovery"
-        ],
+        "tags": ["Asset Discovery"],
         "parameters": [
           {
             "name": "teamId",
@@ -3091,9 +2903,7 @@
       "get": {
         "operationId": "asset_discovery_list_asset_entities_from_a_scan_entry",
         "summary": "List asset entities from a scan entry",
-        "tags": [
-          "Asset Discovery"
-        ],
+        "tags": ["Asset Discovery"],
         "parameters": [
           {
             "name": "type",
@@ -3132,9 +2942,7 @@
       "post": {
         "operationId": "asset_discovery_trigger_a_scan_by_domain_name",
         "summary": "Trigger a scan by domain name",
-        "tags": [
-          "Asset Discovery"
-        ],
+        "tags": ["Asset Discovery"],
         "parameters": [
           {
             "name": "teamId",
@@ -3172,9 +2980,7 @@
       "post": {
         "operationId": "client_iot_create_iot_scan_report",
         "summary": "Create IoT Scan Report",
-        "tags": [
-          "Client"
-        ],
+        "tags": ["Client"],
         "parameters": [],
         "requestBody": {
           "required": false,
@@ -3354,9 +3160,7 @@
       "post": {
         "operationId": "client_mobile_entry_create_a_new_mobile_entry",
         "summary": "(+) Entry - Create a new mobile entry",
-        "tags": [
-          "Client"
-        ],
+        "tags": ["Client"],
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -3373,10 +3177,7 @@
                     "format": "binary"
                   }
                 },
-                "required": [
-                  "name",
-                  "file"
-                ],
+                "required": ["name", "file"],
                 "additionalProperties": false
               }
             }
@@ -3393,9 +3194,7 @@
       "post": {
         "operationId": "client_mobile_entry_update_an_existing_mobile_entry",
         "summary": "(+) Entry - Update an existing mobile entry",
-        "tags": [
-          "Client"
-        ],
+        "tags": ["Client"],
         "parameters": [
           {
             "name": "entryId",
@@ -3421,10 +3220,7 @@
                     "format": "binary"
                   }
                 },
-                "required": [
-                  "name",
-                  "file"
-                ],
+                "required": ["name", "file"],
                 "additionalProperties": false
               }
             }
@@ -3441,9 +3237,7 @@
       "post": {
         "operationId": "client_sca_sast_entry_create_a_new_entry",
         "summary": "(+) Entry - Create a new entry",
-        "tags": [
-          "Client"
-        ],
+        "tags": ["Client"],
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -3460,10 +3254,7 @@
                     "format": "binary"
                   }
                 },
-                "required": [
-                  "name",
-                  "file"
-                ],
+                "required": ["name", "file"],
                 "additionalProperties": false
               }
             }
@@ -3480,9 +3271,7 @@
       "post": {
         "operationId": "client_sca_sast_entry_update_an_existing_entry",
         "summary": "(+) Entry - Update an existing entry",
-        "tags": [
-          "Client"
-        ],
+        "tags": ["Client"],
         "parameters": [
           {
             "name": "entryId",
@@ -3508,9 +3297,7 @@
                     "format": "binary"
                   }
                 },
-                "required": [
-                  "name"
-                ],
+                "required": ["name"],
                 "additionalProperties": false
               }
             }
@@ -3527,9 +3314,7 @@
       "post": {
         "operationId": "client_vpn_create_vpn_scan_report",
         "summary": "Create VPN Scan Report",
-        "tags": [
-          "Client"
-        ],
+        "tags": ["Client"],
         "parameters": [],
         "requestBody": {
           "required": false,
@@ -3681,9 +3466,7 @@
       "get": {
         "operationId": "dast_alerts_get_many_alerts",
         "summary": "!!! Alerts - Get many alerts",
-        "tags": [
-          "DAST"
-        ],
+        "tags": ["DAST"],
         "parameters": [
           {
             "name": "sort",
@@ -3767,9 +3550,7 @@
       "post": {
         "operationId": "dast_domain_check_trigger_when_never_run_failed_or_completed",
         "summary": "(+) Domain Check - Trigger (when never run, failed, or completed)",
-        "tags": [
-          "DAST"
-        ],
+        "tags": ["DAST"],
         "parameters": [
           {
             "name": "teamId",
@@ -3799,9 +3580,7 @@
       "get": {
         "operationId": "dast_alerts_get_one_detail",
         "summary": "Alerts - Get one detail",
-        "tags": [
-          "DAST"
-        ],
+        "tags": ["DAST"],
         "parameters": [
           {
             "name": "teamId",
@@ -3839,9 +3618,7 @@
       "post": {
         "operationId": "dast_entry_create_one",
         "summary": "Entry  - Create One",
-        "tags": [
-          "DAST"
-        ],
+        "tags": ["DAST"],
         "parameters": [
           {
             "name": "teamId",
@@ -3877,9 +3654,7 @@
       "get": {
         "operationId": "dast_entry_get_many_entries",
         "summary": "Entry - Get many entries",
-        "tags": [
-          "DAST"
-        ],
+        "tags": ["DAST"],
         "parameters": [
           {
             "name": "limit",
@@ -3937,9 +3712,7 @@
       "get": {
         "operationId": "dast_entry_check_scan_status_when_active_pending",
         "summary": "Entry - Check Scan Status (when active/pending)",
-        "tags": [
-          "DAST"
-        ],
+        "tags": ["DAST"],
         "parameters": [
           {
             "name": "teamId",
@@ -3969,9 +3742,7 @@
       "delete": {
         "operationId": "dast_entry_delete_one",
         "summary": "Entry - Delete One",
-        "tags": [
-          "DAST"
-        ],
+        "tags": ["DAST"],
         "parameters": [
           {
             "name": "teamId",
@@ -4000,9 +3771,7 @@
         "operationId": "dast_entry_get_one",
         "summary": "Entry - Get One",
         "description": "Query parameters:\n\n- `includes[]=alerts` default unset. In the current version, `alerts` value is still included to prevent errors in production. Later, it will be removed.\n\n- `includes[]=summary` default unset.\n\n- `isDetectedOnly` default `false`.",
-        "tags": [
-          "DAST"
-        ],
+        "tags": ["DAST"],
         "parameters": [
           {
             "name": "includes[]",
@@ -4050,9 +3819,7 @@
       "post": {
         "operationId": "dast_entry_trigger_re_scan_when_failed_completed",
         "summary": "Entry - Trigger Re-scan (when failed/completed)",
-        "tags": [
-          "DAST"
-        ],
+        "tags": ["DAST"],
         "parameters": [
           {
             "name": "teamId",
@@ -4082,9 +3849,7 @@
       "get": {
         "operationId": "dast_path_discovery_list_discovered_paths",
         "summary": "Path Discovery - List Discovered Paths",
-        "tags": [
-          "DAST"
-        ],
+        "tags": ["DAST"],
         "parameters": [
           {
             "name": "teamId",
@@ -4115,9 +3880,7 @@
         "operationId": "dast_path_discovery_trigger_when_never_run_failed_or_completed",
         "summary": "Path Discovery - Trigger (when never run, failed, or completed)",
         "description": "Triggering path discovery can be done when: \n\n- `pathDiscoveryEntry` = null\n- OR `pathDiscoveryEntry.scanStatus` = \"completed\"\n- OR `pathDiscoveryEntry.scanStatus` = \"failed\"",
-        "tags": [
-          "DAST"
-        ],
+        "tags": ["DAST"],
         "parameters": [
           {
             "name": "teamId",
@@ -4147,9 +3910,7 @@
       "post": {
         "operationId": "dictionary_vulnerability_get_explanation",
         "summary": "Vulnerability - Get explanation",
-        "tags": [
-          "Dictionary"
-        ],
+        "tags": ["Dictionary"],
         "parameters": [
           {
             "name": "teamId",
@@ -4179,9 +3940,7 @@
       "post": {
         "operationId": "enrichment_text_get_definition_of_terms",
         "summary": "Text - Get Definition of Terms",
-        "tags": [
-          "Enrichment"
-        ],
+        "tags": ["Enrichment"],
         "parameters": [],
         "requestBody": {
           "required": false,
@@ -4202,9 +3961,7 @@
       "post": {
         "operationId": "enrichment_text_get_terms_from_texts",
         "summary": "Text - Get Terms from Texts",
-        "tags": [
-          "Enrichment"
-        ],
+        "tags": ["Enrichment"],
         "parameters": [],
         "requestBody": {
           "required": false,
@@ -4225,9 +3982,7 @@
       "post": {
         "operationId": "internal_check_system_logging",
         "summary": "Check system logging",
-        "tags": [
-          "Internal"
-        ],
+        "tags": ["Internal"],
         "parameters": [],
         "responses": {
           "default": {
@@ -4240,9 +3995,7 @@
       "post": {
         "operationId": "internal_flows_general_sender",
         "summary": "Flows - General sender",
-        "tags": [
-          "Internal"
-        ],
+        "tags": ["Internal"],
         "parameters": [],
         "requestBody": {
           "required": false,
@@ -4304,9 +4057,7 @@
       "post": {
         "operationId": "iot_scanner_be_create_iot_scan_report",
         "summary": "[?] Create IoT Scan Report",
-        "tags": [
-          "Iot Scanner BE"
-        ],
+        "tags": ["Iot Scanner BE"],
         "parameters": [
           {
             "name": "teamId",
@@ -4451,9 +4202,7 @@
       "get": {
         "operationId": "iot_scanner_be_get_all_iot_data_from_team",
         "summary": "Get All IoT Data From Team",
-        "tags": [
-          "Iot Scanner BE"
-        ],
+        "tags": ["Iot Scanner BE"],
         "parameters": [
           {
             "name": "sort",
@@ -4493,9 +4242,7 @@
       "get": {
         "operationId": "iot_scanner_be_get_one_iot_data",
         "summary": "Get One IoT Data",
-        "tags": [
-          "Iot Scanner BE"
-        ],
+        "tags": ["Iot Scanner BE"],
         "parameters": [
           {
             "name": "reportId",
@@ -4525,9 +4272,7 @@
       "get": {
         "operationId": "llm_llm_get_many_vulnerabilities",
         "summary": "!!! LLM - Get many vulnerabilities",
-        "tags": [
-          "LLM"
-        ],
+        "tags": ["LLM"],
         "parameters": [
           {
             "name": "sort",
@@ -4630,9 +4375,7 @@
       "get": {
         "operationId": "llm_llm_get_many_entries",
         "summary": "(!) LLM - Get many entries",
-        "tags": [
-          "LLM"
-        ],
+        "tags": ["LLM"],
         "parameters": [
           {
             "name": "sort",
@@ -4716,9 +4459,7 @@
       "post": {
         "operationId": "llm_llm_create_one_entry",
         "summary": "LLM - Create one entry",
-        "tags": [
-          "LLM"
-        ],
+        "tags": ["LLM"],
         "parameters": [
           {
             "name": "teamId",
@@ -4765,9 +4506,7 @@
       "delete": {
         "operationId": "llm_llm_delete_one_entry",
         "summary": "LLM - Delete one entry",
-        "tags": [
-          "LLM"
-        ],
+        "tags": ["LLM"],
         "parameters": [
           {
             "name": "teamId",
@@ -4805,9 +4544,7 @@
       "get": {
         "operationId": "llm_llm_get_one_entry_detail",
         "summary": "LLM - Get one entry detail",
-        "tags": [
-          "LLM"
-        ],
+        "tags": ["LLM"],
         "parameters": [
           {
             "name": "teamId",
@@ -4847,9 +4584,7 @@
       "post": {
         "operationId": "m2m_asset_discovery_send_job_notification",
         "summary": "Send job notification",
-        "tags": [
-          "M2M"
-        ],
+        "tags": ["M2M"],
         "parameters": [],
         "requestBody": {
           "required": false,
@@ -4884,9 +4619,7 @@
       "get": {
         "operationId": "m2m_sca_check",
         "summary": "Check",
-        "tags": [
-          "M2M"
-        ],
+        "tags": ["M2M"],
         "parameters": [],
         "responses": {
           "default": {
@@ -4899,9 +4632,7 @@
       "post": {
         "operationId": "m2m_sca_pushed_on_repository",
         "summary": "Pushed on repository",
-        "tags": [
-          "M2M"
-        ],
+        "tags": ["M2M"],
         "parameters": [],
         "requestBody": {
           "required": false,
@@ -4922,9 +4653,7 @@
       "get": {
         "operationId": "mobile_security_alerts_get_many_alerts",
         "summary": "!!! Alerts - Get many alerts",
-        "tags": [
-          "Mobile Security"
-        ],
+        "tags": ["Mobile Security"],
         "parameters": [
           {
             "name": "limit",
@@ -5008,9 +4737,7 @@
       "post": {
         "operationId": "mobile_security_entry_create_one_entry",
         "summary": "Entry - Create one entry",
-        "tags": [
-          "Mobile Security"
-        ],
+        "tags": ["Mobile Security"],
         "parameters": [
           {
             "name": "name",
@@ -5045,10 +4772,7 @@
                     "format": "binary"
                   }
                 },
-                "required": [
-                  "name",
-                  "file"
-                ],
+                "required": ["name", "file"],
                 "additionalProperties": false
               }
             }
@@ -5063,9 +4787,7 @@
       "get": {
         "operationId": "mobile_security_entry_get_many_entries",
         "summary": "Entry - Get many entries",
-        "tags": [
-          "Mobile Security"
-        ],
+        "tags": ["Mobile Security"],
         "parameters": [
           {
             "name": "offset",
@@ -5123,9 +4845,7 @@
       "delete": {
         "operationId": "mobile_security_entry_delete_one_entry",
         "summary": "Entry - Delete one entry",
-        "tags": [
-          "Mobile Security"
-        ],
+        "tags": ["Mobile Security"],
         "parameters": [
           {
             "name": "teamId",
@@ -5153,9 +4873,7 @@
       "get": {
         "operationId": "mobile_security_entry_get_one_entry_detail",
         "summary": "Entry - Get one entry detail",
-        "tags": [
-          "Mobile Security"
-        ],
+        "tags": ["Mobile Security"],
         "parameters": [
           {
             "name": "includes[]",
@@ -5192,9 +4910,7 @@
       "post": {
         "operationId": "mobile_security_entry_update_an_entry_with_new_file",
         "summary": "Entry - Update an entry with new file",
-        "tags": [
-          "Mobile Security"
-        ],
+        "tags": ["Mobile Security"],
         "parameters": [
           {
             "name": "teamId",
@@ -5228,10 +4944,7 @@
                     "format": "binary"
                   }
                 },
-                "required": [
-                  "name",
-                  "file"
-                ],
+                "required": ["name", "file"],
                 "additionalProperties": false
               }
             }
@@ -5248,9 +4961,7 @@
       "get": {
         "operationId": "news_not_used_get_article_detail",
         "summary": "[Not used?] Get Article Detail",
-        "tags": [
-          "News"
-        ],
+        "tags": ["News"],
         "parameters": [
           {
             "name": "teamId",
@@ -5280,9 +4991,7 @@
       "get": {
         "operationId": "news_article_lists",
         "summary": "Article Lists",
-        "tags": [
-          "News"
-        ],
+        "tags": ["News"],
         "parameters": [
           {
             "name": "teamId",
@@ -5304,9 +5013,7 @@
       "get": {
         "operationId": "news_directory_news_check_connection_of_news_service",
         "summary": "News - Check connection of news service",
-        "tags": [
-          "News Directory"
-        ],
+        "tags": ["News Directory"],
         "parameters": [
           {
             "name": "teamId",
@@ -5328,9 +5035,7 @@
       "get": {
         "operationId": "news_directory_news_get_supported_keywords",
         "summary": "News - Get supported keywords",
-        "tags": [
-          "News Directory"
-        ],
+        "tags": ["News Directory"],
         "parameters": [
           {
             "name": "teamId",
@@ -5352,9 +5057,7 @@
       "get": {
         "operationId": "news_directory_news_get_team_keywords",
         "summary": "News - Get team keywords",
-        "tags": [
-          "News Directory"
-        ],
+        "tags": ["News Directory"],
         "parameters": [
           {
             "name": "teamId",
@@ -5377,9 +5080,7 @@
         "operationId": "news_directory_news_get_team_related_news",
         "summary": "News - Get team-related news",
         "description": "# Parametes\n\n- `keywords[]` optional. It is used to add keywords other than predefined team keywords from the system.\n- `search` optional. This will find news with similar search string on news `title` or `snippet`.",
-        "tags": [
-          "News Directory"
-        ],
+        "tags": ["News Directory"],
         "parameters": [
           {
             "name": "withTotal",
@@ -5456,9 +5157,7 @@
         "operationId": "notification_channel_create",
         "summary": "Channel - Create",
         "description": "Body parameters:\n\n- type: email, telegram, webhook, slack\n    \n- name: string\n    \n- config:\n    \n    - address (type = email)\n        \n    - chatId (type = telegram)\n        \n    - url (type = webhook)\n        \n    - channel (type = slack)\n        \n- isEnabled: boolean (optional)",
-        "tags": [
-          "Notification"
-        ],
+        "tags": ["Notification"],
         "parameters": [
           {
             "name": "teamId",
@@ -5507,9 +5206,7 @@
         "operationId": "notification_channel_list_all",
         "summary": "Channel - List All",
         "description": "List all notification channels in a team.\n\nQuery parameters:\n\n- limit: number\n    \n- offset: number\n    \n- order: asc, desc\n    \n- sort: createdOn, updatedOn, type, name, isEnabled\n    \n- type: email, telegram, webhook, slack\n    \n- isEnabled: boolean",
-        "tags": [
-          "Notification"
-        ],
+        "tags": ["Notification"],
         "parameters": [
           {
             "name": "withTotal",
@@ -5540,9 +5237,7 @@
       "delete": {
         "operationId": "notification_channel_delete_one",
         "summary": "Channel - Delete One",
-        "tags": [
-          "Notification"
-        ],
+        "tags": ["Notification"],
         "parameters": [
           {
             "name": "teamId",
@@ -5570,9 +5265,7 @@
       "get": {
         "operationId": "notification_channel_get_one",
         "summary": "Channel - Get One",
-        "tags": [
-          "Notification"
-        ],
+        "tags": ["Notification"],
         "parameters": [
           {
             "name": "teamId",
@@ -5600,9 +5293,7 @@
       "patch": {
         "operationId": "notification_channel_update_one",
         "summary": "Channel - Update One",
-        "tags": [
-          "Notification"
-        ],
+        "tags": ["Notification"],
         "parameters": [
           {
             "name": "teamId",
@@ -5651,9 +5342,7 @@
       "get": {
         "operationId": "notification_notif_list_all",
         "summary": "Notif - List All",
-        "tags": [
-          "Notification"
-        ],
+        "tags": ["Notification"],
         "parameters": [
           {
             "name": "teamId",
@@ -5675,9 +5364,7 @@
       "post": {
         "operationId": "notification_notif_read_unread_multiple",
         "summary": "Notif - Read/Unread - Multiple",
-        "tags": [
-          "Notification"
-        ],
+        "tags": ["Notification"],
         "parameters": [
           {
             "name": "teamId",
@@ -5715,9 +5402,7 @@
       "post": {
         "operationId": "notification_notif_read_unread_one",
         "summary": "Notif - Read/Unread - One",
-        "tags": [
-          "Notification"
-        ],
+        "tags": ["Notification"],
         "parameters": [
           {
             "name": "teamId",
@@ -5755,9 +5440,7 @@
       "post": {
         "operationId": "notification_rule_create",
         "summary": "Rule - Create",
-        "tags": [
-          "Notification"
-        ],
+        "tags": ["Notification"],
         "parameters": [
           {
             "name": "teamId",
@@ -5785,9 +5468,7 @@
       "get": {
         "operationId": "notification_rule_list_all",
         "summary": "Rule - List all",
-        "tags": [
-          "Notification"
-        ],
+        "tags": ["Notification"],
         "parameters": [
           {
             "name": "teamId",
@@ -5809,9 +5490,7 @@
       "delete": {
         "operationId": "notification_rule_delete_one",
         "summary": "Rule - Delete One",
-        "tags": [
-          "Notification"
-        ],
+        "tags": ["Notification"],
         "parameters": [
           {
             "name": "teamId",
@@ -5839,9 +5518,7 @@
       "get": {
         "operationId": "notification_rule_get_one",
         "summary": "Rule - Get One",
-        "tags": [
-          "Notification"
-        ],
+        "tags": ["Notification"],
         "parameters": [
           {
             "name": "teamId",
@@ -5869,9 +5546,7 @@
       "patch": {
         "operationId": "notification_rule_update_one",
         "summary": "Rule - Update One",
-        "tags": [
-          "Notification"
-        ],
+        "tags": ["Notification"],
         "parameters": [
           {
             "name": "teamId",
@@ -5909,9 +5584,7 @@
       "post": {
         "operationId": "notification_rule_enable_disable_one_rule",
         "summary": "Rule - Enable / Disable One Rule",
-        "tags": [
-          "Notification"
-        ],
+        "tags": ["Notification"],
         "parameters": [
           {
             "name": "teamId",
@@ -5949,9 +5622,7 @@
       "post": {
         "operationId": "pat_create_a_pat",
         "summary": "Create a PAT",
-        "tags": [
-          "PAT"
-        ],
+        "tags": ["PAT"],
         "parameters": [],
         "requestBody": {
           "required": false,
@@ -5970,9 +5641,7 @@
       "get": {
         "operationId": "pat_get_many_pats",
         "summary": "Get many PATs",
-        "tags": [
-          "PAT"
-        ],
+        "tags": ["PAT"],
         "parameters": [
           {
             "name": "limit",
@@ -6004,9 +5673,7 @@
       "delete": {
         "operationId": "pat_delete_a_pat",
         "summary": "Delete a PAT",
-        "tags": [
-          "PAT"
-        ],
+        "tags": ["PAT"],
         "parameters": [
           {
             "name": "patId",
@@ -6026,9 +5693,7 @@
       "get": {
         "operationId": "pat_get_one_pat_detail",
         "summary": "Get one PAT detail",
-        "tags": [
-          "PAT"
-        ],
+        "tags": ["PAT"],
         "parameters": [
           {
             "name": "patId",
@@ -6048,9 +5713,7 @@
       "patch": {
         "operationId": "pat_update_one_pat_name_isactive",
         "summary": "Update one PAT (name, isActive)",
-        "tags": [
-          "PAT"
-        ],
+        "tags": ["PAT"],
         "parameters": [
           {
             "name": "patId",
@@ -6091,9 +5754,7 @@
       "put": {
         "operationId": "pat_enable_disable_pat",
         "summary": "Enable/Disable PAT",
-        "tags": [
-          "PAT"
-        ],
+        "tags": ["PAT"],
         "parameters": [
           {
             "name": "patId",
@@ -6123,9 +5784,7 @@
       "post": {
         "operationId": "pat_regenerate_value_of_a_pat",
         "summary": "Regenerate value of a PAT",
-        "tags": [
-          "PAT"
-        ],
+        "tags": ["PAT"],
         "parameters": [
           {
             "name": "patId",
@@ -6147,9 +5806,7 @@
       "post": {
         "operationId": "pat_verify_a_pat",
         "summary": "Verify a PAT",
-        "tags": [
-          "PAT"
-        ],
+        "tags": ["PAT"],
         "parameters": [],
         "requestBody": {
           "required": false,
@@ -6178,9 +5835,7 @@
       "post": {
         "operationId": "report_doc_get_report_in_csv_pdf_excel",
         "summary": "Get report in CSV/PDF/Excel",
-        "tags": [
-          "Report Doc"
-        ],
+        "tags": ["Report Doc"],
         "parameters": [
           {
             "name": "teamId",
@@ -6218,9 +5873,7 @@
       "get": {
         "operationId": "risk_risk_get_one_by_alert",
         "summary": "!!! Risk - Get one by alert",
-        "tags": [
-          "Risk"
-        ],
+        "tags": ["Risk"],
         "parameters": [
           {
             "name": "teamId",
@@ -6248,9 +5901,7 @@
       "patch": {
         "operationId": "risk_risk_update_one_by_alert",
         "summary": "Risk - Update one by alert",
-        "tags": [
-          "Risk"
-        ],
+        "tags": ["Risk"],
         "parameters": [
           {
             "name": "teamId",
@@ -6288,9 +5939,7 @@
       "get": {
         "operationId": "risk_internal_risk_calculate",
         "summary": "(Internal) Risk - Calculate",
-        "tags": [
-          "Risk"
-        ],
+        "tags": ["Risk"],
         "parameters": [
           {
             "name": "teamId",
@@ -6312,9 +5961,7 @@
       "get": {
         "operationId": "risk_internal_trigger_summary",
         "summary": "(Internal) Trigger Summary",
-        "tags": [
-          "Risk"
-        ],
+        "tags": ["Risk"],
         "parameters": [
           {
             "name": "teamId",
@@ -6336,9 +5983,7 @@
       "get": {
         "operationId": "risk_risk_team_summary",
         "summary": "Risk - Team Summary",
-        "tags": [
-          "Risk"
-        ],
+        "tags": ["Risk"],
         "parameters": [
           {
             "name": "teamId",
@@ -6360,9 +6005,7 @@
       "get": {
         "operationId": "samples_client_info_ip_decorator",
         "summary": "Client Info - IP (Decorator)",
-        "tags": [
-          "Samples"
-        ],
+        "tags": ["Samples"],
         "parameters": [],
         "responses": {
           "default": {
@@ -6375,9 +6018,7 @@
       "get": {
         "operationId": "samples_client_info_ip_service",
         "summary": "Client Info - IP (Service)",
-        "tags": [
-          "Samples"
-        ],
+        "tags": ["Samples"],
         "parameters": [],
         "responses": {
           "default": {
@@ -6390,9 +6031,7 @@
       "get": {
         "operationId": "samples_client_info_ip_debug",
         "summary": "Client Info - IP Debug",
-        "tags": [
-          "Samples"
-        ],
+        "tags": ["Samples"],
         "parameters": [],
         "responses": {
           "default": {
@@ -6405,9 +6044,7 @@
       "get": {
         "operationId": "samples_client_info_ip_private_check",
         "summary": "Client Info - IP Private Check",
-        "tags": [
-          "Samples"
-        ],
+        "tags": ["Samples"],
         "parameters": [],
         "responses": {
           "default": {
@@ -6420,9 +6057,7 @@
       "get": {
         "operationId": "sca_sast_sca_get_one_entry",
         "summary": "!!! SCA - Get One Entry",
-        "tags": [
-          "SCA & SAST"
-        ],
+        "tags": ["SCA & SAST"],
         "parameters": [
           {
             "name": "teamId",
@@ -6450,9 +6085,7 @@
       "delete": {
         "operationId": "sca_sast_sca_delete_one_entry",
         "summary": "SCA - Delete One Entry",
-        "tags": [
-          "SCA & SAST"
-        ],
+        "tags": ["SCA & SAST"],
         "parameters": [
           {
             "name": "teamId",
@@ -6482,9 +6115,7 @@
       "get": {
         "operationId": "sca_sast_sca_sast_get_many_entries",
         "summary": "!!! SCA/SAST - Get many entries",
-        "tags": [
-          "SCA & SAST"
-        ],
+        "tags": ["SCA & SAST"],
         "parameters": [
           {
             "name": "limit",
@@ -6542,9 +6173,7 @@
       "get": {
         "operationId": "sca_sast_new_sca_sast_check_repository_status",
         "summary": "[NEW] SCA/SAST - Check repository status",
-        "tags": [
-          "SCA & SAST"
-        ],
+        "tags": ["SCA & SAST"],
         "parameters": [
           {
             "name": "owner",
@@ -6593,9 +6222,7 @@
       "post": {
         "operationId": "sca_sast_sast_create_one",
         "summary": "SAST - Create One",
-        "tags": [
-          "SCA & SAST"
-        ],
+        "tags": ["SCA & SAST"],
         "parameters": [
           {
             "name": "name",
@@ -6630,10 +6257,7 @@
                     "format": "binary"
                   }
                 },
-                "required": [
-                  "name",
-                  "file"
-                ],
+                "required": ["name", "file"],
                 "additionalProperties": false
               }
             }
@@ -6650,9 +6274,7 @@
       "get": {
         "operationId": "sca_sast_sast_get_entry_detail",
         "summary": "SAST - Get Entry Detail",
-        "tags": [
-          "SCA & SAST"
-        ],
+        "tags": ["SCA & SAST"],
         "parameters": [
           {
             "name": "teamId",
@@ -6682,9 +6304,7 @@
       "get": {
         "operationId": "sca_sast_sast_get_many_checks",
         "summary": "SAST - Get many checks",
-        "tags": [
-          "SCA & SAST"
-        ],
+        "tags": ["SCA & SAST"],
         "parameters": [
           {
             "name": "sort",
@@ -6750,9 +6370,7 @@
       "get": {
         "operationId": "sca_sast_sast_get_one_check_detail",
         "summary": "SAST - Get one check detail",
-        "tags": [
-          "SCA & SAST"
-        ],
+        "tags": ["SCA & SAST"],
         "parameters": [
           {
             "name": "teamId",
@@ -6790,9 +6408,7 @@
       "get": {
         "operationId": "sca_sast_sca_check_github_repository_status",
         "summary": "SCA - Check  Github repository status",
-        "tags": [
-          "SCA & SAST"
-        ],
+        "tags": ["SCA & SAST"],
         "parameters": [
           {
             "name": "owner",
@@ -6832,9 +6448,7 @@
       "post": {
         "operationId": "sca_sast_sca_create_one",
         "summary": "SCA - Create one",
-        "tags": [
-          "SCA & SAST"
-        ],
+        "tags": ["SCA & SAST"],
         "parameters": [
           {
             "name": "teamId",
@@ -6860,10 +6474,7 @@
                     "type": "string"
                   }
                 },
-                "required": [
-                  "file",
-                  "name"
-                ],
+                "required": ["file", "name"],
                 "additionalProperties": false
               }
             }
@@ -6880,9 +6491,7 @@
       "get": {
         "operationId": "sca_sast_sca_get_alerts",
         "summary": "SCA - Get Alerts",
-        "tags": [
-          "SCA & SAST"
-        ],
+        "tags": ["SCA & SAST"],
         "parameters": [
           {
             "name": "sort",
@@ -6930,9 +6539,7 @@
       "get": {
         "operationId": "sca_sast_sca_get_one_alert_detail",
         "summary": "SCA - Get One Alert Detail",
-        "tags": [
-          "SCA & SAST"
-        ],
+        "tags": ["SCA & SAST"],
         "parameters": [
           {
             "name": "teamId",
@@ -6970,9 +6577,7 @@
       "get": {
         "operationId": "sca_sast_sca_get_one_secret",
         "summary": "SCA - Get One Secret",
-        "tags": [
-          "SCA & SAST"
-        ],
+        "tags": ["SCA & SAST"],
         "parameters": [
           {
             "name": "teamId",
@@ -7010,9 +6615,7 @@
       "get": {
         "operationId": "sca_sast_sca_list_secrets",
         "summary": "SCA - List Secrets",
-        "tags": [
-          "SCA & SAST"
-        ],
+        "tags": ["SCA & SAST"],
         "parameters": [
           {
             "name": "teamId",
@@ -7042,9 +6645,7 @@
       "post": {
         "operationId": "sca_sast_sca_re_calculate_issues_count",
         "summary": "SCA - Re-calculate issues count",
-        "tags": [
-          "SCA & SAST"
-        ],
+        "tags": ["SCA & SAST"],
         "parameters": [
           {
             "name": "teamId",
@@ -7074,9 +6675,7 @@
       "get": {
         "operationId": "sca_sast_sca_trigger_check_scan_status",
         "summary": "SCA - Trigger check scan status",
-        "tags": [
-          "SCA & SAST"
-        ],
+        "tags": ["SCA & SAST"],
         "parameters": [
           {
             "name": "teamId",
@@ -7106,9 +6705,7 @@
       "post": {
         "operationId": "sca_sast_sca_sast_create_one_using_repository",
         "summary": "SCA/SAST - Create one using repository",
-        "tags": [
-          "SCA & SAST"
-        ],
+        "tags": ["SCA & SAST"],
         "parameters": [
           {
             "name": "teamId",
@@ -7138,9 +6735,7 @@
       "post": {
         "operationId": "sca_sast_sca_sast_update_one_info_or_new_file",
         "summary": "SCA/SAST - Update one (info or new file)",
-        "tags": [
-          "SCA & SAST"
-        ],
+        "tags": ["SCA & SAST"],
         "parameters": [
           {
             "name": "scaEntryId",
@@ -7174,10 +6769,7 @@
                     "format": "binary"
                   }
                 },
-                "required": [
-                  "name",
-                  "file"
-                ],
+                "required": ["name", "file"],
                 "additionalProperties": false
               }
             }
@@ -7194,9 +6786,7 @@
       "post": {
         "operationId": "sca_sast_sca_sast_update_one_using_repository",
         "summary": "SCA/SAST - Update one using repository",
-        "tags": [
-          "SCA & SAST"
-        ],
+        "tags": ["SCA & SAST"],
         "parameters": [
           {
             "name": "entryId",
@@ -7234,9 +6824,7 @@
       "get": {
         "operationId": "summary_get_issues_summary_by_team_id",
         "summary": "!!! Get issues summary by team ID",
-        "tags": [
-          "Summary"
-        ],
+        "tags": ["Summary"],
         "parameters": [
           {
             "name": "isDetectedOnly",
@@ -7267,9 +6855,7 @@
       "get": {
         "operationId": "summary_get_latest_events_by_team_id",
         "summary": "Get latest events by team ID",
-        "tags": [
-          "Summary"
-        ],
+        "tags": ["Summary"],
         "parameters": [
           {
             "name": "teamId",
@@ -7291,9 +6877,7 @@
       "get": {
         "operationId": "summary_get_latest_events_on_shared_teams",
         "summary": "Get latest events on shared teams",
-        "tags": [
-          "Summary"
-        ],
+        "tags": ["Summary"],
         "parameters": [],
         "responses": {
           "default": {
@@ -7306,9 +6890,7 @@
       "get": {
         "operationId": "summary_get_summary_of_shared_team_assets",
         "summary": "Get summary of shared team assets",
-        "tags": [
-          "Summary"
-        ],
+        "tags": ["Summary"],
         "parameters": [],
         "responses": {
           "default": {
@@ -7321,9 +6903,7 @@
       "get": {
         "operationId": "summary_get_summary_of_team_assets_by_team_id",
         "summary": "Get summary of team assets by team ID",
-        "tags": [
-          "Summary"
-        ],
+        "tags": ["Summary"],
         "parameters": [
           {
             "name": "teamId",
@@ -7345,9 +6925,7 @@
       "get": {
         "operationId": "summary_get_vulnerabilities_per_type",
         "summary": "Get vulnerabilities per type",
-        "tags": [
-          "Summary"
-        ],
+        "tags": ["Summary"],
         "parameters": [
           {
             "name": "type",
@@ -7396,9 +6974,7 @@
       "get": {
         "operationId": "team_internal_domain_test",
         "summary": "(Internal) Domain - Test",
-        "tags": [
-          "Team"
-        ],
+        "tags": ["Team"],
         "parameters": [
           {
             "name": "domain",
@@ -7430,9 +7006,7 @@
       "post": {
         "operationId": "team_domain_add_additional_domains",
         "summary": "Domain - Add additional domains",
-        "tags": [
-          "Team"
-        ],
+        "tags": ["Team"],
         "parameters": [
           {
             "name": "teamId",
@@ -7473,9 +7047,7 @@
       "delete": {
         "operationId": "team_domain_delete_an_invalid_domain",
         "summary": "Domain - Delete an invalid domain",
-        "tags": [
-          "Team"
-        ],
+        "tags": ["Team"],
         "parameters": [
           {
             "name": "teamId",
@@ -7505,9 +7077,7 @@
       "post": {
         "operationId": "team_domain_recheck_an_invalid_domain",
         "summary": "Domain - Recheck an invalid domain",
-        "tags": [
-          "Team"
-        ],
+        "tags": ["Team"],
         "parameters": [
           {
             "name": "teamId",
@@ -7537,9 +7107,7 @@
       "post": {
         "operationId": "team_owned_team_approve_a_join_request",
         "summary": "Owned Team - Approve a join request",
-        "tags": [
-          "Team"
-        ],
+        "tags": ["Team"],
         "parameters": [
           {
             "name": "teamId",
@@ -7569,9 +7137,7 @@
       "post": {
         "operationId": "team_owned_team_create_one",
         "summary": "Owned Team - Create One",
-        "tags": [
-          "Team"
-        ],
+        "tags": ["Team"],
         "parameters": [],
         "requestBody": {
           "required": false,
@@ -7598,9 +7164,7 @@
       "get": {
         "operationId": "team_shared_team_get_all",
         "summary": "Shared Team - Get All",
-        "tags": [
-          "Team"
-        ],
+        "tags": ["Team"],
         "parameters": [
           {
             "name": "sort",
@@ -7650,9 +7214,7 @@
       "delete": {
         "operationId": "team_owned_team_delete_a_join_request",
         "summary": "Owned Team - Delete a join request",
-        "tags": [
-          "Team"
-        ],
+        "tags": ["Team"],
         "parameters": [
           {
             "name": "teamId",
@@ -7682,9 +7244,7 @@
       "delete": {
         "operationId": "team_owned_team_delete_a_team_member",
         "summary": "Owned Team - Delete a team member",
-        "tags": [
-          "Team"
-        ],
+        "tags": ["Team"],
         "parameters": [
           {
             "name": "teamId",
@@ -7714,9 +7274,7 @@
       "delete": {
         "operationId": "team_owned_team_delete_own_team",
         "summary": "Owned Team - Delete Own Team",
-        "tags": [
-          "Team"
-        ],
+        "tags": ["Team"],
         "parameters": [
           {
             "name": "teamId",
@@ -7736,9 +7294,7 @@
       "patch": {
         "operationId": "team_owned_team_update_one",
         "summary": "Owned Team - Update One",
-        "tags": [
-          "Team"
-        ],
+        "tags": ["Team"],
         "parameters": [
           {
             "name": "teamId",
@@ -7774,9 +7330,7 @@
       "get": {
         "operationId": "team_shared_team_get_one_by_id",
         "summary": "Shared Team - Get One By ID",
-        "tags": [
-          "Team"
-        ],
+        "tags": ["Team"],
         "parameters": [
           {
             "name": "teamId",
@@ -7798,9 +7352,7 @@
       "get": {
         "operationId": "team_owned_team_list_all_join_requests",
         "summary": "Owned Team - List all join requests",
-        "tags": [
-          "Team"
-        ],
+        "tags": ["Team"],
         "parameters": [
           {
             "name": "limit",
@@ -7858,9 +7410,7 @@
       "get": {
         "operationId": "team_shared_team_get_members_of_a_team",
         "summary": "Shared Team - Get Members of a Team",
-        "tags": [
-          "Team"
-        ],
+        "tags": ["Team"],
         "parameters": [
           {
             "name": "teamId",
@@ -7882,9 +7432,7 @@
       "delete": {
         "operationId": "team_team_exit_team",
         "summary": "Team - Exit team",
-        "tags": [
-          "Team"
-        ],
+        "tags": ["Team"],
         "parameters": [
           {
             "name": "teamId",
@@ -7914,9 +7462,7 @@
       "get": {
         "operationId": "team_team_get_relative_team_profile",
         "summary": "Team - Get relative team profile",
-        "tags": [
-          "Team"
-        ],
+        "tags": ["Team"],
         "parameters": [
           {
             "name": "teamId",
@@ -7938,9 +7484,7 @@
       "post": {
         "operationId": "team_team_join_a_team",
         "summary": "Team - Join a team",
-        "tags": [
-          "Team"
-        ],
+        "tags": ["Team"],
         "parameters": [
           {
             "name": "teamId",
@@ -7962,9 +7506,7 @@
       "post": {
         "operationId": "vpn_scanner_be_create_vpn_scan_report",
         "summary": "Create VPN Scan Report",
-        "tags": [
-          "VPN Scanner BE"
-        ],
+        "tags": ["VPN Scanner BE"],
         "parameters": [
           {
             "name": "teamId",
@@ -8123,9 +7665,7 @@
       "get": {
         "operationId": "vpn_scanner_be_get_all_vpn_data_from_team",
         "summary": "Get All VPN Data From Team",
-        "tags": [
-          "VPN Scanner BE"
-        ],
+        "tags": ["VPN Scanner BE"],
         "parameters": [
           {
             "name": "sort",
@@ -8183,9 +7723,7 @@
       "get": {
         "operationId": "vpn_scanner_be_get_one_vpn_data",
         "summary": "Get One VPN Data",
-        "tags": [
-          "VPN Scanner BE"
-        ],
+        "tags": ["VPN Scanner BE"],
         "parameters": [
           {
             "name": "reportId",
@@ -8215,9 +7753,7 @@
       "get": {
         "operationId": "vulnerability_scoring_get_score",
         "summary": "Get score",
-        "tags": [
-          "Vulnerability Scoring"
-        ],
+        "tags": ["Vulnerability Scoring"],
         "parameters": [
           {
             "name": "type",
@@ -8257,9 +7793,7 @@
       "get": {
         "operationId": "waf_entry_get_one_entry_details",
         "summary": "(!) Entry - Get one entry details",
-        "tags": [
-          "WAF"
-        ],
+        "tags": ["WAF"],
         "parameters": [
           {
             "name": "teamId",
@@ -8287,9 +7821,7 @@
       "delete": {
         "operationId": "waf_entry_delete_one",
         "summary": "Entry - Delete one",
-        "tags": [
-          "WAF"
-        ],
+        "tags": ["WAF"],
         "parameters": [
           {
             "name": "teamId",
@@ -8319,9 +7851,7 @@
       "get": {
         "operationId": "waf_entry_check_scan_status_when_pending_in_progress",
         "summary": "Entry - Check scan status (when pending / in_progress)",
-        "tags": [
-          "WAF"
-        ],
+        "tags": ["WAF"],
         "parameters": [
           {
             "name": "teamId",
@@ -8351,9 +7881,7 @@
       "post": {
         "operationId": "waf_entry_create_one",
         "summary": "Entry - Create one",
-        "tags": [
-          "WAF"
-        ],
+        "tags": ["WAF"],
         "parameters": [
           {
             "name": "teamId",
@@ -8392,9 +7920,7 @@
       "get": {
         "operationId": "waf_entry_get_many_entries",
         "summary": "Entry - Get many entries",
-        "tags": [
-          "WAF"
-        ],
+        "tags": ["WAF"],
         "parameters": [
           {
             "name": "sort",
@@ -8434,9 +7960,7 @@
       "post": {
         "operationId": "waf_entry_trigger_rescan_when_completed_failed",
         "summary": "Entry - Trigger rescan (when completed / failed)",
-        "tags": [
-          "WAF"
-        ],
+        "tags": ["WAF"],
         "parameters": [
           {
             "name": "teamId",
@@ -8466,9 +7990,7 @@
       "get": {
         "operationId": "waf_results_get_many_scan_results",
         "summary": "Results - Get many scan results",
-        "tags": [
-          "WAF"
-        ],
+        "tags": ["WAF"],
         "parameters": [
           {
             "name": "sort",

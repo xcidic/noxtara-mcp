@@ -4,18 +4,18 @@ How to run and deploy the Noxtara MCP HTTP server on the dev host. Production to
 
 ## Production overview
 
-| Item | Value |
-| --- | --- |
-| Host | UpCloud VM, Ubuntu 24.04, hostname `mcp` |
-| IP | `213.163.203.233` |
-| SSH | `root@213.163.203.233` (key-based) |
-| Deploy directory | `/opt/noxtara-mcp/deploy/` |
-| Orchestration | Docker Compose (`compose.yml` in deploy dir) |
-| Container | `deploy-mcp-1` (image `deploy-mcp`) |
-| MCP URL | `http://213.163.203.233:23300/mcp/<pat>` |
-| Health | `http://213.163.203.233:23300/health` |
-| API backend | `https://dev.appsec.xcidic.com/api/main` |
-| Auth | PAT in URL path (`/mcp/<pat>`), not in env |
+| Item             | Value                                        |
+| ---------------- | -------------------------------------------- |
+| Host             | UpCloud VM, Ubuntu 24.04, hostname `mcp`     |
+| IP               | `213.163.203.233`                            |
+| SSH              | `root@213.163.203.233` (key-based)           |
+| Deploy directory | `/opt/noxtara-mcp/deploy/`                   |
+| Orchestration    | Docker Compose (`compose.yml` in deploy dir) |
+| Container        | `deploy-mcp-1` (image `deploy-mcp`)          |
+| MCP URL          | `http://213.163.203.233:23300/mcp/<pat>`     |
+| Health           | `http://213.163.203.233:23300/health`        |
+| API backend      | `https://dev.appsec.xcidic.com/api/main`     |
+| Auth             | PAT in URL path (`/mcp/<pat>`), not in env   |
 
 The legacy **systemd** unit `noxtara-mcp-dev.service` and tree `/opt/noxtara-mcp/current/` are retired. Do not use them for new deploys.
 
@@ -115,11 +115,11 @@ Ensure `.env` exists on the server before `docker compose up`. It is not copied 
 
 Server file: `/opt/noxtara-mcp/deploy/.env`
 
-| Variable | Required | Example | Notes |
-| --- | --- | --- | --- |
-| `NOXTARA_API_BASE_URL` | Yes | `https://dev.appsec.xcidic.com/api/main` | Backend for tool invocations |
-| `NODE_OPTIONS` | No | `--max-old-space-size=1536` | Set in `compose.yml` for the 2 GiB VM |
-| `NOXTARA_PAT` | No | — | HTTP mode: clients pass PAT in `/mcp/<pat>` |
+| Variable               | Required | Example                                  | Notes                                       |
+| ---------------------- | -------- | ---------------------------------------- | ------------------------------------------- |
+| `NOXTARA_API_BASE_URL` | Yes      | `https://dev.appsec.xcidic.com/api/main` | Backend for tool invocations                |
+| `NODE_OPTIONS`         | No       | `--max-old-space-size=1536`              | Set in `compose.yml` for the 2 GiB VM       |
+| `NOXTARA_PAT`          | No       | —                                        | HTTP mode: clients pass PAT in `/mcp/<pat>` |
 
 Template in the repo: [`.env.example`](../.env.example).
 
@@ -147,25 +147,25 @@ console.log('tools', r.tools.length, 'over 64 chars', long.length);
 
 ## Operations
 
-| Task | Command (on server, in deploy dir) |
-| --- | --- |
-| Logs | `docker compose logs -f mcp` (includes `[UPSTREAM]` lines for API calls) |
-| Restart | `docker compose restart mcp` |
-| Stop | `docker compose down` |
-| Rebuild only | `docker compose build` |
-| Shell in container | `docker exec -it deploy-mcp-1 sh` |
+| Task               | Command (on server, in deploy dir)                                       |
+| ------------------ | ------------------------------------------------------------------------ |
+| Logs               | `docker compose logs -f mcp` (includes `[UPSTREAM]` lines for API calls) |
+| Restart            | `docker compose restart mcp`                                             |
+| Stop               | `docker compose down`                                                    |
+| Rebuild only       | `docker compose build`                                                   |
+| Shell in container | `docker exec -it deploy-mcp-1 sh`                                        |
 
 Compose sets `mem_limit: 1800m` and `restart: unless-stopped`. The VM has ~2 GiB RAM; avoid running heavy workloads alongside MCP without resizing the VM.
 
 ## Troubleshooting
 
-| Symptom | Likely cause | What to do |
-| --- | --- | --- |
-| Cursor: tool name max 64 chars | Old spec or old image | Redeploy; confirm `specs/main-api.openapi.json` has no `operationId` longer than 64 chars |
-| Container exits / OOM | Heap + low RAM | Confirm `NODE_OPTIONS` in compose; consider 4 GiB VM |
-| `Unknown tool` after deploy | Client cache or renamed tools | Reconnect MCP; tool names may change when long `operationId`s are truncated |
-| Health check failing | Server still starting or crash loop | `docker compose logs mcp`; wait ~30s for first healthy |
-| API errors on invoke | Wrong `NOXTARA_API_BASE_URL` or invalid PAT | Check `.env` and client URL path |
+| Symptom                        | Likely cause                                | What to do                                                                                |
+| ------------------------------ | ------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| Cursor: tool name max 64 chars | Old spec or old image                       | Redeploy; confirm `specs/main-api.openapi.json` has no `operationId` longer than 64 chars |
+| Container exits / OOM          | Heap + low RAM                              | Confirm `NODE_OPTIONS` in compose; consider 4 GiB VM                                      |
+| `Unknown tool` after deploy    | Client cache or renamed tools               | Reconnect MCP; tool names may change when long `operationId`s are truncated               |
+| Health check failing           | Server still starting or crash loop         | `docker compose logs mcp`; wait ~30s for first healthy                                    |
+| API errors on invoke           | Wrong `NOXTARA_API_BASE_URL` or invalid PAT | Check `.env` and client URL path                                                          |
 
 ## Security notes
 
@@ -175,15 +175,15 @@ Compose sets `mem_limit: 1800m` and `restart: unless-stopped`. The VM has ~2 GiB
 
 ## Repository layout (deploy-related)
 
-| Path | Purpose |
-| --- | --- |
-| `Dockerfile` | Multi-stage image build |
-| `compose.yml` | Production Compose service definition |
-| `.dockerignore` | Keeps image context small (no submodules, docs, tests) |
-| `specs/main-api.openapi.json` | Runtime tool definitions (commit when APIs change) |
-| `scripts/generate-openapi.ts` | Regenerate spec from Bruno submodule |
-| `src/runtime/openapi/tool-name.ts` | 64-char tool name limit (Cursor / MCP clients) |
-| `.env.example` | Document server env vars |
+| Path                               | Purpose                                                |
+| ---------------------------------- | ------------------------------------------------------ |
+| `Dockerfile`                       | Multi-stage image build                                |
+| `compose.yml`                      | Production Compose service definition                  |
+| `.dockerignore`                    | Keeps image context small (no submodules, docs, tests) |
+| `specs/main-api.openapi.json`      | Runtime tool definitions (commit when APIs change)     |
+| `scripts/generate-openapi.ts`      | Regenerate spec from Bruno submodule                   |
+| `src/runtime/openapi/tool-name.ts` | 64-char tool name limit (Cursor / MCP clients)         |
+| `.env.example`                     | Document server env vars                               |
 
 ## Future improvements (not implemented)
 
