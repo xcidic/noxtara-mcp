@@ -121,6 +121,10 @@ export const parseDocs = (value: unknown) => {
   return undefined
 }
 
+import { limitToolName } from "../../src/runtime/openapi/tool-name.ts"
+
+export { limitToolName }
+
 export const sanitizeOperationId = (relativePath: string, method: string) => {
   const fromPath = relativePath
     .replace(/\.bru$/i, "")
@@ -132,7 +136,8 @@ export const sanitizeOperationId = (relativePath: string, method: string) => {
     .replace(/^_+|_+$/g, "")
 
   const normalized = fromPath || `${method.toLowerCase()}_request`
-  return /^[a-z]/.test(normalized) ? normalized : `op_${normalized}`
+  const baseName = /^[a-z]/.test(normalized) ? normalized : `op_${normalized}`
+  return limitToolName(baseName)
 }
 
 export { isRecord, asString }

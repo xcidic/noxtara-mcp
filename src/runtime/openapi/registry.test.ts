@@ -55,4 +55,13 @@ describe("OpenAPI registry", () => {
       "Missing PAT. Set NOXTARA_PAT to authenticate API requests.",
     )
   })
+
+  it("limits all tool names to at most 64 characters matching MCP pattern", () => {
+    const registry = createOpenApiRegistry({ specPath, forceReload: true })
+    expect(registry.tools.length).toBeGreaterThan(0)
+    for (const tool of registry.tools) {
+      expect(tool.name.length).toBeLessThanOrEqual(64)
+      expect(tool.name).toMatch(/^[a-zA-Z0-9_-]{1,64}$/)
+    }
+  })
 })

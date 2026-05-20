@@ -10,6 +10,7 @@ import { sessionLog } from "../../debug/session-log.ts"
 import { extract } from "./extract.ts"
 import { invokeWithLayer } from "./invoke.ts"
 import { parse } from "./parse.ts"
+import { limitToolName } from "./tool-name.ts"
 import type { ExtractedOperation, OperationBinding } from "./types.ts"
 
 export const DEFAULT_API_BASE_URL = "https://dev.appsec.xcidic.com/api/main"
@@ -147,9 +148,10 @@ const loadRegistry = (specPath: string, baseUrl: string): OpenApiRegistry => {
         `${operation.method.toUpperCase()} ${operation.pathTemplate}`
 
       const operationId = String(operation.operationId)
+      const toolName = limitToolName(operationId)
 
       return {
-        name: operationId,
+        name: toolName,
         displayName: Option.getOrUndefined(operation.summary) ?? operationId,
         description,
         tags: [...operation.tags],
@@ -224,6 +226,7 @@ const loadRegistry = (specPath: string, baseUrl: string): OpenApiRegistry => {
           { "x-pat": pat },
           {},
           NodeHttpClient.layerUndici,
+          { tool: name },
         ).pipe(
           Effect.map((response) => {
             const payload = response.data ?? response.error

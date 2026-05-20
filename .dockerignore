@@ -1,0 +1,12 @@
+.git
+.github
+.references
+.cursor
+.zed
+node_modules
+dist
+submodules
+docs
+*.md
+!package.json
+vitest.config.ts

@@ -5,6 +5,13 @@ import { HttpClient, HttpClientRequest } from "effect/unstable/http"
 import { isSessionDebugEnabled, sessionLogEffect } from "../../debug/session-log.ts"
 import { OpenApiInvocationError } from "./errors.ts"
 import {
+  formatUpstreamHeaders,
+  formatUpstreamUrl,
+  logUpstreamError,
+  logUpstreamFinish,
+  logUpstreamStart,
+} from "./upstream-log.ts"
+import {
   type EncodingObject,
   type OperationBinding,
   InvocationResult,
@@ -435,11 +442,17 @@ const applyRequestBody = (
 // Public API — invoke a single operation
 // ---------------------------------------------------------------------------
 
+type InvokeLogContext = {
+  baseUrl: string
+  tool?: string
+}
+
 export const invoke = Effect.fn("OpenApi.invoke")(function* (
   operation: OperationBinding,
   args: Record<string, unknown>,
   resolvedHeaders: Record<string, string>,
   sourceQueryParams: Record<string, string> = {},
+  logContext?: InvokeLogContext,
 ) {
   const client = yield* HttpClient.HttpClient
 
@@ -500,6 +513,20 @@ export const invoke = Effect.fn("OpenApi.invoke")(function* (
 
   request = applyHeaders(request, resolvedHeaders)
 
+  const upstreamUrl =
+    logContext !== undefined ? formatUpstreamUrl(logContext.baseUrl, request) : undefined
+  const upstreamStarted = performance.now()
+
+  if (upstreamUrl !== undefined && logContext !== undefined) {
+    logUpstreamStart({
+      method: request.method,
+      url: upstreamUrl,
+      tool: logContext.tool,
+      headers: formatUpstreamHeaders(request),
+      hasBody: request.body._tag !== "Empty",
+    })
+  }
+
   const response = yield* client.execute(request).pipe(
     Effect.mapError(
       (err) =>
@@ -509,9 +536,33 @@ export const invoke = Effect.fn("OpenApi.invoke")(function* (
           cause: err,
         }),
     ),
+    Effect.tapError((err) =>
+      Effect.sync(() => {
+        if (upstreamUrl === undefined) return
+        logUpstreamError({
+          method: request.method,
+          url: upstreamUrl,
+          ms: Math.round(performance.now() - upstreamStarted),
+          tool: logContext?.tool,
+          message: err.message,
+        })
+      }),
+    ),
   )
 
   const status = response.status
+  const upstreamMs = Math.round(performance.now() - upstreamStarted)
+
+  if (upstreamUrl !== undefined && logContext !== undefined) {
+    logUpstreamFinish({
+      method: request.method,
+      url: upstreamUrl,
+      status,
+      ms: upstreamMs,
+      tool: logContext.tool,
+      ok: status >= 200 && status < 300,
+    })
+  }
   yield* Effect.annotateCurrentSpan({
     "http.status_code": status,
   })
@@ -557,6 +608,7 @@ export const invokeWithLayer = (
   resolvedHeaders: Record<string, string>,
   sourceQueryParams: Record<string, string>,
   httpClientLayer: Layer.Layer<HttpClient.HttpClient, never, never>,
+  logContext?: { tool?: string },
 ) => {
   const clientWithBaseUrl = baseUrl
     ? Layer.effect(
@@ -568,7 +620,10 @@ export const invokeWithLayer = (
       ).pipe(Layer.provide(httpClientLayer))
     : httpClientLayer
 
-  const program = invoke(operation, args, resolvedHeaders, sourceQueryParams).pipe(
+  const program = invoke(operation, args, resolvedHeaders, sourceQueryParams, {
+    baseUrl,
+    ...(logContext?.tool !== undefined ? { tool: logContext.tool } : {}),
+  }).pipe(
     Effect.provide(clientWithBaseUrl),
     Effect.withSpan("plugin.openapi.invoke", {
       attributes: {

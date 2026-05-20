@@ -1,6 +1,7 @@
 import {
   asString,
   isRecord,
+  limitToolName,
   parseBrunoCollection,
   parseDocs,
   sanitizeOperationId,
@@ -69,7 +70,7 @@ export const brunoCollectionToOpenApi = () => {
     const count = usedOperationIds.get(operationId) ?? 0
     usedOperationIds.set(operationId, count + 1)
     if (count > 0) {
-      operationId = `${operationId}_${count + 1}`
+      operationId = limitToolName(`${operationId}_${count + 1}`)
     }
 
     const summary = asString(meta.name) ?? request.relativePath.replace(/\.bru$/i, "")

@@ -1,265 +1,199 @@
-# Deployment plan (container-based)
+# Deployment guide
 
-**Status:** Deferred — not implemented yet.
+How to run and deploy the Noxtara MCP HTTP server on the dev host. Production today is **Docker Compose on a single VM**, deployed manually over SSH (no CI pipeline yet).
 
-This document describes the planned migration from the current bare-metal deployment on the dev MCP host to a container-based setup. It consolidates findings from the existing server (`213.163.203.233`) and design decisions discussed in planning.
+## Production overview
 
-## Current state (as of 2026-05-18)
+| Item | Value |
+| --- | --- |
+| Host | UpCloud VM, Ubuntu 24.04, hostname `mcp` |
+| IP | `213.163.203.233` |
+| SSH | `root@213.163.203.233` (key-based) |
+| Deploy directory | `/opt/noxtara-mcp/deploy/` |
+| Orchestration | Docker Compose (`compose.yml` in deploy dir) |
+| Container | `deploy-mcp-1` (image `deploy-mcp`) |
+| MCP URL | `http://213.163.203.233:23300/mcp/<pat>` |
+| Health | `http://213.163.203.233:23300/health` |
+| API backend | `https://dev.appsec.xcidic.com/api/main` |
+| Auth | PAT in URL path (`/mcp/<pat>`), not in env |
 
-| Item           | Value                                                                    |
-| -------------- | ------------------------------------------------------------------------ |
-| Host           | UpCloud VM, Ubuntu 24.04, hostname `mcp`                                 |
-| IP             | `213.163.203.233`                                                        |
-| Local hostname | `mcp.appsec.xcidic.com` (only in `/etc/hosts` via cloud-init)            |
-| Runtime        | systemd unit `noxtara-mcp-dev.service`                                   |
-| User           | `noxtara` (nologin)                                                      |
-| App path       | `/opt/noxtara-mcp/current/` (full repo copy, **no `.git`**)              |
-| Process        | `node /opt/noxtara-mcp/current/src/cli.ts mcp-http --port 23300`         |
-| API backend    | `NOXTARA_API_BASE_URL=https://dev.appsec.xcidic.com/api/main`            |
-| Node heap      | `NODE_OPTIONS=--max-old-space-size=1536` (required after OOM on startup) |
-| RAM            | ~1.8 GiB (tight for heap + OS)                                           |
-| Exposure       | HTTP on **23300** publicly (ufw); no reverse proxy, no TLS               |
-| Auth           | PAT in URL path: `/mcp/<pat>`                                            |
-| Docker         | Installed and enabled; no containers in use                              |
-| Deploy method  | Manual copy to server (not CI-driven)                                    |
-
-Startup loads `specs/main-api.openapi.json` (generated at build time from the Bruno collection). Runtime no longer parses `.bru` files.
-
-## Goals
-
-1. Run the MCP HTTP server in a **container** built in CI, not on the server.
-2. Replace the systemd + git-tree-on-disk model with **pull image + compose up**.
-3. Optionally add **HTTPS** and a stable hostname (see [Reverse proxy and TLS](#reverse-proxy-and-tls)).
-4. Allow **wiping** the current deployment (`noxtara-mcp-dev.service`, `/opt/noxtara-mcp/current`) after cutover.
-
-## Recommended stack
-
-| Choice                | Decision             | Rationale                                                                    |
-| --------------------- | -------------------- | ---------------------------------------------------------------------------- |
-| Container engine      | **Docker**           | Already on the VM; Compose tooling is standard.                              |
-| Orchestration on host | **Docker Compose**   | One file for MCP + optional proxy, env files, restart policy, memory limits. |
-| Image registry        | **GHCR** (TBD)       | Build in CI; server only pulls.                                              |
-| Reverse proxy         | **Caddy** (optional) | Simple TLS + port 443; not required for Docker itself.                       |
-| Kubernetes / Swarm    | **No**               | Single-service VM; unnecessary complexity.                                   |
-
-Podman is a reasonable alternative org-wide, but offers no benefit on this host where Docker is already installed.
-
-## Target architecture
+The legacy **systemd** unit `noxtara-mcp-dev.service` and tree `/opt/noxtara-mcp/current/` are retired. Do not use them for new deploys.
 
 ```mermaid
-flowchart TB
-  subgraph host["VM mcp (UpCloud)"]
-    subgraph compose["docker compose"]
-      Proxy["caddy optional\n:443 TLS"]
-      MCP["noxtara-mcp\n:23300 internal"]
-    end
-    Proxy --> MCP
-  end
-  Client["MCP clients"] -->|HTTPS optional| Proxy
-  Client -->|HTTP dev only| MCP
+flowchart LR
+  Client["MCP clients\n(Cursor, etc.)"] -->|HTTP :23300| MCP["deploy-mcp-1"]
   MCP -->|HTTPS| API["dev.appsec.xcidic.com/api/main"]
 ```
 
-### Minimal path (dev, no proxy)
+## Prerequisites
 
-- Publish container port **23300** to the host (same as today).
-- Clients: `http://213.163.203.233:23300/mcp/<pat>`
-- No DNS or Caddy required.
-- **Downside:** PAT and traffic are unencrypted on the wire.
+**On your machine**
 
-### Recommended path (public dev host)
+- SSH access to `root@213.163.203.233`
+- This repo cloned with submodules when regenerating OpenAPI (see below)
+- `pnpm` for local checks (`pnpm run check`)
 
-- MCP listens only on the **Compose internal network** (not published publicly).
-- **Caddy** (or nginx / Traefik / Cloudflare) terminates TLS on **443**.
-- Clients: `https://mcp.appsec.xcidic.com/mcp/<pat>`
-- ufw: allow **80** (ACME) and **443**; **do not** expose 23300 publicly.
+**On the server** (already configured)
 
-## Reverse proxy and TLS
+- Docker and Docker Compose
+- Deploy tree at `/opt/noxtara-mcp/deploy/` (copy of repo artifacts needed for build)
+- `.env` in the deploy directory (see [Environment](#environment))
 
-### Do we need Caddy?
+## What gets deployed
 
-**No — not for containers.** Caddy is optional infrastructure for:
+The container image is built from the repo root `Dockerfile`:
 
-| Problem        | Without proxy                                   | With Caddy (or similar)                     |
-| -------------- | ----------------------------------------------- | ------------------------------------------- |
-| Encryption     | HTTP only; PAT in URL is visible on the network | TLS on 443                                  |
-| Client URL     | `http://IP:23300/...`                           | `https://hostname/...`                      |
-| Certificates   | Manual or none                                  | Automatic Let's Encrypt when DNS is correct |
-| Attack surface | App port on the internet                        | Only 443 public; app port internal          |
+1. **Build stage:** install deps, run `tsdown` → `dist/`
+2. **Runner stage:** production deps, `dist/`, and **`specs/main-api.openapi.json`**
 
-The application does not implement TLS today. For a host reachable from the public internet with PAT-in-URL auth, **some TLS termination is strongly recommended**.
+Runtime does **not** read Bruno `.bru` files or git submodules. The committed OpenAPI spec is the source of truth in production.
 
-Alternatives to Caddy on the same VM:
+Submodules are only needed **on your laptop** when running `pnpm run generate:openapi` (Bruno collection → spec). The Docker build stubs `@usebruno/lang` so it never clones submodules on the server.
 
-- **Cloudflare** (or CDN) in front — TLS at the edge; lock down origin.
-- **UpCloud load balancer** with TLS.
-- **TLS in Node** — would require new code; not planned in MVP.
-- **VPN / SSH tunnel only** — skip public DNS and public HTTPS if access is internal.
+## Before you deploy
 
-## DNS configuration
+### 1. Regenerate OpenAPI (when API surface changed)
 
-### What exists today
+If Bruno or apidocs changed, refresh the spec locally and commit it:
 
-On the server, cloud-init sets a **local** hosts entry:
-
-```text
-127.0.1.1  mcp.appsec.xcidic.com  mcp
+```bash
+./scripts/submodules.sh   # if submodules are missing
+pnpm run generate:openapi
+pnpm run check
+git add specs/main-api.openapi.json scripts/
 ```
 
-That name works **only on the VM**. It does not help laptops, MCP clients, or Let's Encrypt. Public lookup for `mcp.appsec.xcidic.com` was **NXDOMAIN** at planning time.
+`generate:openapi` applies `limitToolName()` so `operationId` values stay ≤ 64 characters (required by Cursor’s MCP client). The registry applies the same limit at runtime as a safety net.
 
-### What to add (when using a hostname + HTTPS)
+### 2. Smoke-test locally (optional)
 
-In the DNS provider for the `appsec.xcidic.com` zone (or parent zone), create:
-
-| Type  | Name  | Value             | Notes                                                         |
-| ----- | ----- | ----------------- | ------------------------------------------------------------- |
-| **A** | `mcp` | `213.163.203.233` | If zone is `appsec.xcidic.com` → FQDN `mcp.appsec.xcidic.com` |
-
-Adjust the record name if the managed zone is `xcidic.com` (e.g. name `mcp.appsec`).
-
-After propagation:
-
-```text
-mcp.appsec.xcidic.com  →  213.163.203.233
+```bash
+cp .env.example .env
+docker compose up --build
+curl -s http://127.0.0.1:23300/health
+# MCP: http://127.0.0.1:23300/mcp/<your-pat>
 ```
 
-### Why DNS matters
+Default local port in `pnpm run mcp-http` is **3434**; Compose uses **23300** to match production.
 
-| Use case                                                 | Needs public DNS?                                 |
-| -------------------------------------------------------- | ------------------------------------------------- |
-| Docker / Compose internal service names (`mcp`, `caddy`) | No                                                |
-| Clients connecting by IP `:23300`                        | No                                                |
-| Clients using `https://mcp.appsec.xcidic.com`            | **Yes**                                           |
-| Let's Encrypt HTTP-01 (Caddy default)                    | **Yes** — CA must resolve the name to this server |
+## Deploy to dev (SSH + rsync)
 
-DNS is **not** required for the container migration itself; it is required for a **stable hostname** and **automated HTTPS** on that hostname.
+From the **repository root** on your machine:
 
-## Container image requirements
+```bash
+HOST=root@213.163.203.233
+REMOTE_DIR=/opt/noxtara-mcp/deploy
 
-### Build (CI)
+rsync -avz \
+  --exclude .git \
+  --exclude .references \
+  --exclude submodules \
+  --exclude node_modules \
+  --exclude dist \
+  --exclude .cursor \
+  --exclude .zed \
+  ./ "${HOST}:${REMOTE_DIR}/"
 
-Multi-stage `Dockerfile`:
-
-1. **Builder:** Node 24, pnpm, `git submodule update --init --recursive`, `pnpm install --frozen-lockfile`, `pnpm run build`.
-2. **Runner:** Copy `dist/`, production `node_modules`, and **runtime submodule trees**.
-
-CI checkout must enable submodules:
-
-```yaml
-- uses: actions/checkout@v6
-  with:
-    submodules: recursive
+ssh "${HOST}" "cd ${REMOTE_DIR} && docker compose build && docker compose up -d"
 ```
 
-### Runtime command
+This syncs source, spec, Dockerfile, and Compose file, rebuilds the image on the VM, and recreates the container if the image changed.
 
-```text
-node --max-old-space-size=1536 dist/cli.mjs mcp-http --port 23300
+### First-time server setup
+
+If `/opt/noxtara-mcp/deploy/` does not exist yet:
+
+```bash
+ssh root@213.163.203.233 "mkdir -p /opt/noxtara-mcp/deploy"
+# run rsync + compose commands above
+ssh root@213.163.203.233 "cd /opt/noxtara-mcp/deploy && cp .env.example .env && \$EDITOR .env"
 ```
 
-Use a built artifact (`dist/cli.mjs`), not `src/cli.ts` on the server.
+Ensure `.env` exists on the server before `docker compose up`. It is not copied from your laptop (and should not contain secrets in git).
 
-### What must be in the image
+## Environment
 
-The image must include the committed OpenAPI spec:
+Server file: `/opt/noxtara-mcp/deploy/.env`
 
-```text
-specs/main-api.openapi.json
+| Variable | Required | Example | Notes |
+| --- | --- | --- | --- |
+| `NOXTARA_API_BASE_URL` | Yes | `https://dev.appsec.xcidic.com/api/main` | Backend for tool invocations |
+| `NODE_OPTIONS` | No | `--max-old-space-size=1536` | Set in `compose.yml` for the 2 GiB VM |
+| `NOXTARA_PAT` | No | — | HTTP mode: clients pass PAT in `/mcp/<pat>` |
+
+Template in the repo: [`.env.example`](../.env.example).
+
+## Verify after deploy
+
+```bash
+ssh root@213.163.203.233 "cd /opt/noxtara-mcp/deploy && docker compose ps"
+curl -s http://213.163.203.233:23300/health
 ```
 
-Regenerate this file when apidocs changes (`pnpm run generate:openapi` on a dev machine with submodules checked out). Production images do not need `submodules/product-appsec-apidocs` or `@usebruno/lang`.
+Expect `{"status":"ok"}` and container status **healthy** (healthcheck hits `/health` every 30s).
 
-### Environment variables
+Check tool names inside the running container (all should be ≤ 64 chars):
 
-| Variable               | Required       | Notes                                                      |
-| ---------------------- | -------------- | ---------------------------------------------------------- |
-| `NOXTARA_API_BASE_URL` | Yes            | e.g. `https://dev.appsec.xcidic.com/api/main`              |
-| `NODE_OPTIONS`         | Optional       | Default heap is usually sufficient after OpenAPI migration |
-| `NOXTARA_PAT`          | No (HTTP mode) | PAT comes from client URL `/mcp/<pat>`                     |
-
-Provide secrets via Compose `env_file` on the server (not baked into the image).
-
-### Resources
-
-- Set Compose `mem_limit` (~1800m on a 2 GiB VM).
-- Prefer **4 GiB RAM** on the VM for heap + OS + Caddy headroom.
-- Add a healthcheck (e.g. expect 404 on `/` or a dedicated health route).
-
-## Repository artifacts (to implement later)
-
-| Path                          | Purpose                                     |
-| ----------------------------- | ------------------------------------------- |
-| `Dockerfile`                  | Multi-stage build with submodules           |
-| `.dockerignore`               | Exclude `.git`, tests, `.references/`, etc. |
-| `deploy/compose.yml`          | MCP service + optional Caddy                |
-| `deploy/Caddyfile`            | TLS + reverse proxy to `mcp:23300`          |
-| `deploy/.env.example`         | Document server-side env vars               |
-| `.github/workflows/` (extend) | Build, push image on tag or `main`          |
-
-Server deploy directory (on VM, not necessarily in git): e.g. `/opt/noxtara-mcp/deploy/` with `compose.yml`, `Caddyfile`, and `.env`.
-
-## CI/CD model
-
-| Where      | Responsibility                                                                                      |
-| ---------- | --------------------------------------------------------------------------------------------------- |
-| **CI**     | Submodule init, install, build, `docker build`, push to registry (pin tags, avoid `latest` in prod) |
-| **Server** | `docker compose pull && docker compose up -d` only                                                  |
-
-No `pnpm install` or git checkout on the server after migration.
-
-## Example Compose sketch (not final)
-
-```yaml
-services:
-  mcp:
-    image: ghcr.io/<org>/noxtara-mcp:<tag>
-    restart: unless-stopped
-    env_file: .env
-    environment:
-      NODE_OPTIONS: --max-old-space-size=1536
-      NOXTARA_API_BASE_URL: https://dev.appsec.xcidic.com/api/main
-    expose:
-      - "23300"
-    mem_limit: 1800m
-
-  caddy:
-    image: caddy:2-alpine
-    restart: unless-stopped
-    ports:
-      - "443:443"
-      - "80:80"
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile
-      - caddy_data:/data
-    depends_on:
-      - mcp
+```bash
+ssh root@213.163.203.233 "docker exec deploy-mcp-1 node -e \"
+const { createOpenApiRegistry } = await import('./dist/runtime/openapi/registry.mjs');
+const r = createOpenApiRegistry({ forceReload: true });
+const long = r.tools.filter(t => t.name.length > 64);
+console.log('tools', r.tools.length, 'over 64 chars', long.length);
+\""
 ```
 
-Omit the `caddy` service for the minimal HTTP-only path; publish `23300:23300` on `mcp` instead.
+**Clients:** reconnect MCP in Cursor (or restart the MCP session) so the tool list refreshes.
 
-## Migration and wipe (after cutover)
+## Operations
 
-1. Implement and merge container artifacts; CI publishes first image.
-2. Smoke-test locally: `docker compose up`.
-3. On VM: create `/opt/noxtara-mcp/deploy/`, add `compose.yml`, optional `Caddyfile`, `.env`.
-4. Configure DNS (if using hostname + HTTPS).
-5. Start stack; verify MCP against dev API.
-6. Stop and disable `noxtara-mcp-dev.service`; remove unit file.
-7. Remove `/opt/noxtara-mcp/current` (legacy tree).
-8. Update ufw: allow 80/443 if using Caddy; remove public 23300.
-9. Optionally remove `noxtara` system user if unused.
+| Task | Command (on server, in deploy dir) |
+| --- | --- |
+| Logs | `docker compose logs -f mcp` (includes `[UPSTREAM]` lines for API calls) |
+| Restart | `docker compose restart mcp` |
+| Stop | `docker compose down` |
+| Rebuild only | `docker compose build` |
+| Shell in container | `docker exec -it deploy-mcp-1 sh` |
 
-## Open decisions (deferred)
+Compose sets `mem_limit: 1800m` and `restart: unless-stopped`. The VM has ~2 GiB RAM; avoid running heavy workloads alongside MCP without resizing the VM.
 
-- [ ] Image registry and image name (`ghcr.io/...`)
-- [ ] Deploy trigger: manual pull on tag vs automated SSH deploy from CI
-- [ ] Hostname: `mcp.appsec.xcidic.com` vs IP-only for now
-- [ ] VM resize to 4 GiB before cutover
-- [ ] Include Caddy in v1 or ship HTTP-only first
-- [ ] Separate dev/prod hosts or Compose profiles
+## Troubleshooting
+
+| Symptom | Likely cause | What to do |
+| --- | --- | --- |
+| Cursor: tool name max 64 chars | Old spec or old image | Redeploy; confirm `specs/main-api.openapi.json` has no `operationId` longer than 64 chars |
+| Container exits / OOM | Heap + low RAM | Confirm `NODE_OPTIONS` in compose; consider 4 GiB VM |
+| `Unknown tool` after deploy | Client cache or renamed tools | Reconnect MCP; tool names may change when long `operationId`s are truncated |
+| Health check failing | Server still starting or crash loop | `docker compose logs mcp`; wait ~30s for first healthy |
+| API errors on invoke | Wrong `NOXTARA_API_BASE_URL` or invalid PAT | Check `.env` and client URL path |
+
+## Security notes
+
+- MCP is **HTTP only** on a public IP; the PAT appears in the URL. Treat the PAT as a secret and prefer TLS when exposing this beyond trusted dev use.
+- Do not commit `.env` or PATs. Rotate PATs if a URL was leaked.
+- ufw allows **23300** publicly today. A future improvement is TLS on 443 (Caddy or CDN) and not publishing 23300.
+
+## Repository layout (deploy-related)
+
+| Path | Purpose |
+| --- | --- |
+| `Dockerfile` | Multi-stage image build |
+| `compose.yml` | Production Compose service definition |
+| `.dockerignore` | Keeps image context small (no submodules, docs, tests) |
+| `specs/main-api.openapi.json` | Runtime tool definitions (commit when APIs change) |
+| `scripts/generate-openapi.ts` | Regenerate spec from Bruno submodule |
+| `src/runtime/openapi/tool-name.ts` | 64-char tool name limit (Cursor / MCP clients) |
+| `.env.example` | Document server env vars |
+
+## Future improvements (not implemented)
+
+- **CI + GHCR:** build image in GitHub Actions; server runs `docker compose pull && up -d` only
+- **TLS:** Caddy (or similar) on 443, DNS `mcp.appsec.xcidic.com` → `213.163.203.233`
+- **Deploy script:** wrap rsync + remote compose in `scripts/deploy.sh`
+- **Separate dev/prod hosts** or Compose profiles
 
 ## Related docs
 
 - [PLAN.md](../PLAN.md) — product and MCP architecture
-- [AGENTS.md](../AGENTS.md) — local dev conventions (pnpm, submodules)
+- [AGENTS.md](../AGENTS.md) — local dev (pnpm, submodules)
+- [openapi-migration-handoff.md](./openapi-migration-handoff.md) — OpenAPI migration notes

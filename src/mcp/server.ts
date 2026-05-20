@@ -175,8 +175,16 @@ export const startNoxtaraMcpHttpServer = async (options?: {
 
   const httpServer = createServer(async (req, res) => {
     try {
-      const body = await readBody(req)
       const url = new URL(req.url ?? "/", `http://${req.headers.host ?? host}`)
+      console.error(`[HTTP] ${req.method} ${url.pathname} - headers:`, JSON.stringify(req.headers))
+
+      if (url.pathname === "/health") {
+        res.writeHead(200, { "content-type": "application/json" })
+        res.end(JSON.stringify({ status: "ok" }))
+        return
+      }
+
+      const body = await readBody(req)
       const pathAuth = extractPatFromMcpPath(url.pathname)
       if ("error" in pathAuth) {
         res.writeHead(pathAuth.status)
